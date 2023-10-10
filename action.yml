@@ -1,0 +1,99 @@
+name: 'Vulnerability scan'
+description: 'Perform vulnerability scan and report using trivy'
+inputs:
+  image-ref:
+    description: Image to scan (if not specified an fs scan is done)
+    required: false
+    default: ''
+  junit-test-output:
+    description: Location to write JUnit test report to
+    required: false
+    default: ''
+  create-test-report:
+    description: If a JUnit test report should be created by the action (otherwise it is assumed to report is handled outside of the action)
+    required: false
+    default: false
+  fail-for:
+    description: Issue types for fail for if they are present (added to JUnit report)
+    type: string
+    default: CRITICAL
+  report-retention:
+    description: Number of days to retain the HTML report
+    type: string
+    default: 30
+  trivy-action-version:
+    required: true
+    default: '0.12.0'
+runs:
+  using: "composite"
+  steps:
+    #
+    # Scan for security vulnerabilities
+    #
+
+      # https://github.com/aquasecurity/trivy-action
+    - name: Scan Docker image for critical vulnerabilities
+      uses: aquasecurity/trivy-action@${{ inputs.trivy-action-version }}
+      if: "${{ inputs.junit-test-output != '' || inputs.create-test-report }}"
+      with:
+        image-ref: '${{ inputs.image-ref }}'
+        scan-type: "${{ inputs.image-ref != '' && 'image' || 'fs' }}"
+        format: 'template'
+        template: '@/contrib/junit.tpl'
+        output: "${{ inputs.junit-test-output != '' && inputs.junit-test-output || 'trivy.xml' }}"
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: ${{ inputs.fail-for }}
+
+    - name: Create vulnerability report as HTML
+      uses: aquasecurity/trivy-action@${{ inputs.trivy-action-version }}
+      with:
+        image-ref: '${{ inputs.image-ref }}'
+        scan-type: "${{ inputs.image-ref == '' && 'image' || 'fs' }}"
+        format: 'template'
+        template: '@/contrib/html.tpl'
+        output: 'trivy.html'
+    - name: Upload vulnerability report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: Vulnerability report (HTML)
+        path: trivy.html
+        retention-days: ${{ inputs.report-retention }}
+
+    - name: Download vulnerability summary template # TODO instead from action repo?
+      # env:
+      #   TOKEN: ${{ secrets.GH_PAT }}
+      # -H "Authorization: token ${TOKEN}"
+      run: |
+        curl -o summary.tpl https://raw.githubusercontent.com/wetransform/gha-workflows/master/trivy/summary.tpl
+    - name: Create summary on vulnerabilities
+      uses: aquasecurity/trivy-action@${{ inputs.trivy-action-version }}
+      with:
+        image-ref: '${{ inputs.image-ref }}'
+        scan-type: "${{ inputs.image-ref == '' && 'image' || 'fs' }}"
+        format: 'template'
+        template: '@summary.tpl'
+        output: 'trivy.md'
+    - name: Add to job summary
+      run: |
+        cat trivy.md >> $GITHUB_STEP_SUMMARY
+
+    #
+    # Report on unit tests and critical vulnerabilities
+    #
+
+      # https://github.com/marketplace/actions/junit-report-action
+    - name: Publish Test Report
+      uses: mikepenz/action-junit-report@v3
+      if: ${{ always() && inputs.create-test-report }} # always run even if the previous step fails
+      with:
+        report_paths: "${{ inputs.junit-test-output != '' && inputs.junit-test-output || 'trivy.xml' }}"
+
+        fail_on_failure: true
+
+        # Workaround for check that is additionally created being associated
+        # to the wrong workflow/run. Instead not additional check is created.
+        # See https://github.com/mikepenz/action-junit-report/issues/40
+        annotate_only: true
+        detailed_summary: true
