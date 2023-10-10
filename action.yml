@@ -21,9 +21,6 @@ inputs:
     description: Number of days to retain the HTML report
     type: string
     default: 30
-  trivy-action-version:
-    required: true
-    default: '0.12.0'
 runs:
   using: "composite"
   steps:
@@ -33,7 +30,7 @@ runs:
 
       # https://github.com/aquasecurity/trivy-action
     - name: Scan Docker image for critical vulnerabilities
-      uses: aquasecurity/trivy-action@${{ inputs.trivy-action-version }}
+      uses: aquasecurity/trivy-action@0.12.0
       if: "${{ inputs.junit-test-output != '' || inputs.create-test-report }}"
       with:
         image-ref: '${{ inputs.image-ref }}'
@@ -46,7 +43,7 @@ runs:
         severity: ${{ inputs.fail-for }}
 
     - name: Create vulnerability report as HTML
-      uses: aquasecurity/trivy-action@${{ inputs.trivy-action-version }}
+      uses: aquasecurity/trivy-action@0.12.0
       with:
         image-ref: '${{ inputs.image-ref }}'
         scan-type: "${{ inputs.image-ref == '' && 'image' || 'fs' }}"
@@ -68,7 +65,7 @@ runs:
       run: |
         curl -o summary.tpl https://raw.githubusercontent.com/wetransform/gha-workflows/master/trivy/summary.tpl
     - name: Create summary on vulnerabilities
-      uses: aquasecurity/trivy-action@${{ inputs.trivy-action-version }}
+      uses: aquasecurity/trivy-action@0.12.0
       with:
         image-ref: '${{ inputs.image-ref }}'
         scan-type: "${{ inputs.image-ref == '' && 'image' || 'fs' }}"
