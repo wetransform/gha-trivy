@@ -58,20 +58,17 @@ runs:
         path: trivy.html
         retention-days: ${{ inputs.report-retention-days }}
 
-    - name: Download vulnerability summary template # TODO instead from action repo?
-      # env:
-      #   TOKEN: ${{ secrets.GH_PAT }}
-      # -H "Authorization: token ${TOKEN}"
+    - name: Copy vulnerability summary template
       shell: bash
       run: |
-        curl -o summary.tpl https://raw.githubusercontent.com/wetransform/gha-workflows/master/trivy/summary.tpl
+        cp ${GITHUB_ACTION_PATH}/summary.tpl ./trivy-summary.tpl
     - name: Create summary on vulnerabilities
       uses: aquasecurity/trivy-action@0.12.0
       with:
         image-ref: '${{ inputs.image-ref }}'
         scan-type: "${{ inputs.image-ref != '' && 'image' || 'fs' }}"
         format: 'template'
-        template: '@summary.tpl'
+        template: '@trivy-summary.tpl'
         output: 'trivy.md'
     - name: Add to job summary
       shell: bash
