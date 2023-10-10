@@ -17,7 +17,7 @@ inputs:
     description: Issue types for fail for if they are present (added to JUnit report)
     type: string
     default: CRITICAL
-  report-retention:
+  report-retention-days:
     description: Number of days to retain the HTML report
     type: string
     default: 30
@@ -59,7 +59,7 @@ runs:
       with:
         name: Vulnerability report (HTML)
         path: trivy.html
-        retention-days: ${{ inputs.report-retention }}
+        retention-days: ${{ inputs.report-retention-days }}
 
     - name: Download vulnerability summary template # TODO instead from action repo?
       # env:
