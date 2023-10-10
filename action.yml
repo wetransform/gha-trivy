@@ -46,7 +46,7 @@ runs:
       uses: aquasecurity/trivy-action@0.12.0
       with:
         image-ref: '${{ inputs.image-ref }}'
-        scan-type: "${{ inputs.image-ref == '' && 'image' || 'fs' }}"
+        scan-type: "${{ inputs.image-ref != '' && 'image' || 'fs' }}"
         format: 'template'
         template: '@/contrib/html.tpl'
         output: 'trivy.html'
@@ -69,7 +69,7 @@ runs:
       uses: aquasecurity/trivy-action@0.12.0
       with:
         image-ref: '${{ inputs.image-ref }}'
-        scan-type: "${{ inputs.image-ref == '' && 'image' || 'fs' }}"
+        scan-type: "${{ inputs.image-ref != '' && 'image' || 'fs' }}"
         format: 'template'
         template: '@summary.tpl'
         output: 'trivy.md'
