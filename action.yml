@@ -19,6 +19,9 @@ inputs:
   report-retention-days:
     description: Number of days to retain the HTML report
     default: 30
+  report-tag:
+    description: Custom tag for report file, discern multiple reports created in the same run. By the default the job ID is used
+    default: ''
 runs:
   using: "composite"
   steps:
@@ -40,6 +43,18 @@ runs:
         vuln-type: 'os,library'
         severity: ${{ inputs.fail-for }}
 
+    - name: Determine report file name
+      shell: bash
+      run: |
+          # Use report tag or job ID
+          INPUT_STRING="${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-trivy.html"
+
+          # Replace invalid characters with underscores
+          VALID_FILENAME=$(echo "$INPUT_STRING" | sed 's/[^A-Za-z0-9_.-]/_/g')
+
+          # Set the processed value as an environment variable
+          echo "REPORT_FILENAME=$VALID_FILENAME" >> $GITHUB_ENV
+
     - name: Create vulnerability report as HTML
       uses: aquasecurity/trivy-action@0.12.0
       with:
@@ -47,13 +62,13 @@ runs:
         scan-type: "${{ inputs.image-ref != '' && 'image' || 'fs' }}"
         format: 'template'
         template: '@/contrib/html.tpl'
-        output: '${{ github.job }}-trivy.html'
+        output: ${{ env.REPORT_FILENAME }}
     - name: Upload vulnerability report
       uses: actions/upload-artifact@v3
       if: always()
       with:
         name: Vulnerability report (HTML)
-        path: '${{ github.job }}-trivy.html'
+        path: ${{ env.REPORT_FILENAME }}
         retention-days: ${{ inputs.report-retention-days }}
 
     - name: Copy vulnerability summary template
