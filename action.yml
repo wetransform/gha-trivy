@@ -47,13 +47,13 @@ runs:
         scan-type: "${{ inputs.image-ref != '' && 'image' || 'fs' }}"
         format: 'template'
         template: '@/contrib/html.tpl'
-        output: 'trivy.html'
+        output: '${{ github.job }}-trivy.html'
     - name: Upload vulnerability report
       uses: actions/upload-artifact@v3
       if: always()
       with:
         name: Vulnerability report (HTML)
-        path: trivy.html
+        path: '${{ github.job }}-trivy.html'
         retention-days: ${{ inputs.report-retention-days }}
 
     - name: Copy vulnerability summary template
