@@ -86,6 +86,7 @@ runs:
     - name: Add to job summary
       shell: bash
       run: |
+        echo "### Vulnerability summary (${{ inputs.image-ref != '' && inputs.image-ref || 'fs' }})\n\n" >> $GITHUB_STEP_SUMMARY
         cat trivy.md >> $GITHUB_STEP_SUMMARY
 
     #
