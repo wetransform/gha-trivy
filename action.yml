@@ -1,5 +1,7 @@
 name: 'Vulnerability scan'
 description: 'Perform vulnerability scan and report using trivy'
+icon: search
+color: blue
 inputs:
   image-ref:
     description: Image to scan (if not specified an fs scan is done)
