@@ -25,9 +25,25 @@ inputs:
   report-tag:
     description: Custom tag for report file, discern multiple reports created in the same run. By the default the job ID is used
     default: ''
+  check-image-user:
+    description: If the user of the Docker image should be checked to be non-root
+    default: 'true' # Note: Action inputs are always of type string
 runs:
   using: "composite"
   steps:
+
+    #
+    # Check Docker image user
+    #
+
+    - name: Check Docker image user
+      uses: wetransform/gha-docker-nonroot@master
+      if: "${{ inputs.check-image-user == 'true' && inputs.image-ref != '' && (inputs.junit-test-output != '' || inputs.create-test-report) }}"
+      with:
+        image-ref: ${{ inputs.image-ref }}
+        fail-for-root: false # rather use JUnit report
+        junit-test-output: "${{ inputs.junit-test-output != '' && inputs.junit-test-output || 'trivy.xml' }}-user-check.xml"
+
     #
     # Scan for security vulnerabilities
     #
