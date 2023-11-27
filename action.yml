@@ -117,7 +117,7 @@ runs:
       uses: mikepenz/action-junit-report@v3
       if: ${{ always() && inputs.create-test-report == 'true' }} # always run even if the previous step fails
       with:
-        report_paths: "${{ inputs.junit-test-output != '' && inputs.junit-test-output || 'trivy.xml' }}"
+        report_paths: "${{ inputs.junit-test-output != '' && inputs.junit-test-output || 'trivy.xml' }}*"
 
         fail_on_failure: true
 
