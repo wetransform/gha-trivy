@@ -42,6 +42,8 @@ runs:
       with:
         image-ref: ${{ inputs.image-ref }}
         fail-for-root: false # rather use JUnit report
+        # XXX disable check until we clarified how to deal with root users in images
+        create-junit-output: false
         junit-test-output: "${{ inputs.junit-test-output != '' && inputs.junit-test-output || 'trivy.xml' }}-user-check.xml"
 
     #
