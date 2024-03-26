@@ -2,7 +2,7 @@
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   extends: [ // default presets see https://docs.renovatebot.com/presets-default/
     "config:recommended",
-    "helpers:pinGitHubActionDigestsToSemver",
+    // "helpers:pinGitHubActionDigestsToSemver",
     "security:openssf-scorecard",
     ":disableDependencyDashboard",
     ":disableRateLimiting",
@@ -15,12 +15,12 @@
     "renovate/{{updateType}}",
   ],
   packageRules: [
-    {
+    /*{
       description: "Ignore frequent renovate updates",
       enabled: false,
       matchPackageNames: ["renovatebot/github-action"],
       matchUpdateTypes: ["patch"],
-    },
+    },*/
     {
       description: "Update renovatebot/github-action minor updates on Sundays",
       matchPackageNames: ["renovatebot/github-action"],
@@ -30,9 +30,9 @@
     {
       description: "Update to action dependencies use fix commits to trigger a release",
       matchFileNames: ["action.yml"],
-      // semanticCommitType: "fix",
+      semanticCommitType: "fix",
       // extends: [":semanticCommitType(fix)"]
-      extends: [":semanticCommitTypeAll(fix)"]
+      // extends: [":semanticCommitTypeAll(fix)"]
     },
   ],
   prBodyTemplate: "{{{table}}}{{{notes}}}{{{changelogs}}}",
@@ -73,5 +73,5 @@ semver-coerced\
 {{/if}}"
     },
   ],
-  separateMinorPatch: false,
+  separateMinorPatch: true,
 }
