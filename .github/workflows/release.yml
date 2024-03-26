@@ -2,9 +2,9 @@
 name: Release
 
 "on":
-  workflow_dispatch:
-  push:
-    branches: [master]
+  workflow_dispatch: # only release on-demand (GitHub releases need to be edited manually after creation to show up in the marketplace)
+  # push:
+  #   branches: [master]
 
 env:
   # renovate: datasource=npm depName=@semantic-release/changelog
