@@ -37,7 +37,7 @@ runs:
     #
 
     - name: Check Docker image user
-      uses: wetransform/gha-docker-nonroot@v1
+      uses: wetransform/gha-docker-nonroot@163ae1a864ddafcada42e97e86f4b0e96e732510 # v1
       if: "${{ inputs.check-image-user == 'true' && inputs.image-ref != '' && (inputs.junit-test-output != '' || inputs.create-test-report) }}"
       with:
         image-ref: ${{ inputs.image-ref }}
