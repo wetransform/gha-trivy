@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/wetransform/gha-trivy/compare/v2.0.0...v2.0.1) (2024-06-19)
+
+
+### Bug Fixes
+
+* avoid using invalid characters for artifact name ([d6c04e7](https://github.com/wetransform/gha-trivy/commit/d6c04e7c87db5667df07656eb1679fd5d2ae7f6f))
+
 ## [2.0.0](https://github.com/wetransform/gha-trivy/compare/v1.1.1...v2.0.0) (2024-06-19)
 
 
