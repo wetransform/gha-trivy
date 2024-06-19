@@ -1,3 +1,23 @@
+## [2.0.0](https://github.com/wetransform/gha-trivy/compare/v1.1.1...v2.0.0) (2024-06-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* Reports are no longer uploaded to the same shared
+artifact, because of the update to upload-artifact version 4
+
+### Features
+
+* add CSV representation of SBOM ([2bc1659](https://github.com/wetransform/gha-trivy/commit/2bc165991a988b0330c3c99d2b959ce10db27d0c))
+* generate SBOM and use if for repeated scans ([ad54fe9](https://github.com/wetransform/gha-trivy/commit/ad54fe9b546b24dc1e583e9a582592f01c63f210))
+
+
+### Bug Fixes
+
+* **deps:** pin dependencies ([1de9f8e](https://github.com/wetransform/gha-trivy/commit/1de9f8edd115de1824a7eae52364ca7875f31446))
+* **deps:** update all non-major dependencies ([666b486](https://github.com/wetransform/gha-trivy/commit/666b486dc333d3e664aeba42fa469cb22a6cca81))
+* sanitize SBOM file names ([d71a0be](https://github.com/wetransform/gha-trivy/commit/d71a0bee035a1fab51075d36906eeac6a2577cab))
+
 ## [1.1.1](https://github.com/wetransform/gha-trivy/compare/v1.1.0...v1.1.1) (2024-04-12)
 
 
