@@ -32,6 +32,19 @@ runs:
   using: "composite"
   steps:
 
+    - name: Determine valid report slug and file name
+      shell: bash
+      run: |
+          # Use report tag or job ID
+          INPUT_STRING="${{ inputs.report-tag != '' && inputs.report-tag || github.job }}"
+
+          # Replace invalid characters with underscores
+          VALID_SLUG=$(echo "$INPUT_STRING" | sed 's/[^A-Za-z0-9_.-]/_/g')
+
+          # Set the processed value as an environment variable
+          echo "REPORT_SLUG=$VALID_SLUG" >> $GITHUB_ENV
+          echo "REPORT_FILENAME=${VALID_SLUG}-trivy.html" >> $GITHUB_ENV
+
     - name: Install CycloneDX CLI # https://github.com/CycloneDX/cyclonedx-cli
       uses: jaxxstorm/action-install-gh-release@v1.12.0
       with:
@@ -80,18 +93,18 @@ runs:
         scan-type: "${{ inputs.image-ref != '' && 'image' || 'fs' }}"
         format: 'cyclonedx' # spdx-json
         template: '@/contrib/junit.tpl'
-        output: "${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-sbom.json"
+        output: "${{ env.REPORT_SLUG }}-sbom.json"
     - name: Create CSV representation
       shell: bash
       run: |
-        cyclonedx-cli convert --input-file ${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-sbom.json --output-file ${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-sbom.csv --output-format csv
+        cyclonedx-cli convert --input-file ${{ env.REPORT_SLUG }}-sbom.json --output-file ${{ env.REPORT_SLUG }}-sbom.csv --output-format csv
     - name: Upload SBOM
       uses: actions/upload-artifact@v4
       with:
         name: SBOM (CycloneDX) [${{ inputs.report-tag != '' && inputs.report-tag || github.job }}]
         path: |
-          ${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-sbom.json
-          ${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-sbom.csv
+          ${{ env.REPORT_SLUG }}-sbom.json
+          ${{ env.REPORT_SLUG }}-sbom.csv
         retention-days: ${{ inputs.report-retention-days }}
 
       # https://github.com/aquasecurity/trivy-action
@@ -99,7 +112,7 @@ runs:
       uses: aquasecurity/trivy-action@0.23.0
       if: "${{ inputs.junit-test-output != '' || inputs.create-test-report }}"
       with:
-        scan-ref: "${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-sbom.json"
+        scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
         scan-type: sbom
         format: 'template'
         template: '@/contrib/junit.tpl'
@@ -108,22 +121,10 @@ runs:
         vuln-type: 'os,library'
         severity: ${{ inputs.fail-for }}
 
-    - name: Determine report file name
-      shell: bash
-      run: |
-          # Use report tag or job ID
-          INPUT_STRING="${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-trivy.html"
-
-          # Replace invalid characters with underscores
-          VALID_FILENAME=$(echo "$INPUT_STRING" | sed 's/[^A-Za-z0-9_.-]/_/g')
-
-          # Set the processed value as an environment variable
-          echo "REPORT_FILENAME=$VALID_FILENAME" >> $GITHUB_ENV
-
     - name: Create vulnerability report as HTML
       uses: aquasecurity/trivy-action@0.23.0
       with:
-        scan-ref: "${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-sbom.json"
+        scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
         scan-type: sbom
         format: 'template'
         template: '@/contrib/html.tpl'
@@ -143,7 +144,7 @@ runs:
     - name: Create summary on vulnerabilities
       uses: aquasecurity/trivy-action@0.23.0
       with:
-        scan-ref: "${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-sbom.json"
+        scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
         scan-type: sbom
         format: 'template'
         template: '@trivy-summary.tpl'
