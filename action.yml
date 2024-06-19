@@ -101,7 +101,7 @@ runs:
     - name: Upload SBOM
       uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
       with:
-        name: SBOM (CycloneDX) [${{ inputs.report-tag != '' && inputs.report-tag || github.job }}]
+        name: SBOM (CycloneDX) [${{ env.REPORT_SLUG }}]
         path: |
           ${{ env.REPORT_SLUG }}-sbom.json
           ${{ env.REPORT_SLUG }}-sbom.csv
@@ -133,7 +133,7 @@ runs:
       uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
       if: always()
       with:
-        name: Vulnerability report (HTML) [${{ inputs.report-tag != '' && inputs.report-tag || github.job }}]
+        name: Vulnerability report (HTML) [${{ env.REPORT_SLUG }}]
         path: ${{ env.REPORT_FILENAME }}
         retention-days: ${{ inputs.report-retention-days }}
 
