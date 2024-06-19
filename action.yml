@@ -51,12 +51,30 @@ runs:
     #
 
       # https://github.com/aquasecurity/trivy-action
-    - name: Scan Docker image for critical vulnerabilities
-      uses: aquasecurity/trivy-action@fbd16365eb88e12433951383f5e99bd901fc618f # 0.12.0
+      # Approach based on https://github.com/aquasecurity/trivy-action/issues/173#issuecomment-1497774518
+    - name: Create SBOM
+      uses: aquasecurity/trivy-action@0.23.0
       if: "${{ inputs.junit-test-output != '' || inputs.create-test-report }}"
       with:
         image-ref: '${{ inputs.image-ref }}'
         scan-type: "${{ inputs.image-ref != '' && 'image' || 'fs' }}"
+        format: 'cyclonedx' # spdx-json
+        template: '@/contrib/junit.tpl'
+        output: "${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-sbom.json"
+    - name: Upload SBOM
+      uses: actions/upload-artifact@v4
+      with:
+        name: SBOM (CycloneDX) [${{ inputs.report-tag != '' && inputs.report-tag || github.job }}]
+        path: "${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-sbom.json"
+        retention-days: ${{ inputs.report-retention-days }}
+
+      # https://github.com/aquasecurity/trivy-action
+    - name: Scan for critical vulnerabilities (create JUnit report)
+      uses: aquasecurity/trivy-action@0.23.0
+      if: "${{ inputs.junit-test-output != '' || inputs.create-test-report }}"
+      with:
+        scan-ref: "${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-sbom.json"
+        scan-type: sbom
         format: 'template'
         template: '@/contrib/junit.tpl'
         output: "${{ inputs.junit-test-output != '' && inputs.junit-test-output || 'trivy.xml' }}"
@@ -77,18 +95,18 @@ runs:
           echo "REPORT_FILENAME=$VALID_FILENAME" >> $GITHUB_ENV
 
     - name: Create vulnerability report as HTML
-      uses: aquasecurity/trivy-action@fbd16365eb88e12433951383f5e99bd901fc618f # 0.12.0
+      uses: aquasecurity/trivy-action@0.23.0
       with:
-        image-ref: '${{ inputs.image-ref }}'
-        scan-type: "${{ inputs.image-ref != '' && 'image' || 'fs' }}"
+        scan-ref: "${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-sbom.json"
+        scan-type: sbom
         format: 'template'
         template: '@/contrib/html.tpl'
         output: ${{ env.REPORT_FILENAME }}
     - name: Upload vulnerability report
-      uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: Vulnerability report (HTML)
+        name: Vulnerability report (HTML) [${{ inputs.report-tag != '' && inputs.report-tag || github.job }}]
         path: ${{ env.REPORT_FILENAME }}
         retention-days: ${{ inputs.report-retention-days }}
 
@@ -97,10 +115,10 @@ runs:
       run: |
         cp ${GITHUB_ACTION_PATH}/summary.tpl ./trivy-summary.tpl
     - name: Create summary on vulnerabilities
-      uses: aquasecurity/trivy-action@d710430a6722f083d3b36b8339ff66b32f22ee55 # 0.19.0
+      uses: aquasecurity/trivy-action@0.23.0
       with:
-        image-ref: '${{ inputs.image-ref }}'
-        scan-type: "${{ inputs.image-ref != '' && 'image' || 'fs' }}"
+        scan-ref: "${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-sbom.json"
+        scan-type: sbom
         format: 'template'
         template: '@trivy-summary.tpl'
         output: 'trivy.md'
