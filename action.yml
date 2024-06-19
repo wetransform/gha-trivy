@@ -32,6 +32,26 @@ runs:
   using: "composite"
   steps:
 
+    - name: Install CycloneDX CLI # https://github.com/CycloneDX/cyclonedx-cli
+      uses: jaxxstorm/action-install-gh-release@v1.12.0
+      with:
+        repo: CycloneDX/cyclonedx-cli
+        tag: v0.25.1 # optional, otherwise use latest
+
+        # extension-matching: disable # disable extension matching because artifacts are binaries
+
+        # work around action picking wrong artifact (with `musl`) - open issue on specifying artifact manually see https://github.com/jaxxstorm/action-install-gh-release/issues/84
+        extension: -linux-x64
+        platform: cyclone
+        arch: dx
+
+        rename-to: cyclonedx-cli
+        chmod: 0755
+        cache: enable # only works if using specific tag
+    - name: Verify CycloneDX CLI install
+      shell: bash
+      run: cyclonedx-cli --version
+
     #
     # Check Docker image user
     #
@@ -61,11 +81,17 @@ runs:
         format: 'cyclonedx' # spdx-json
         template: '@/contrib/junit.tpl'
         output: "${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-sbom.json"
+    - name: Create CSV representation
+      shell: bash
+      run: |
+        cyclonedx-cli convert --input-file ${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-sbom.json --output-file ${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-sbom.csv --output-format csv
     - name: Upload SBOM
       uses: actions/upload-artifact@v4
       with:
         name: SBOM (CycloneDX) [${{ inputs.report-tag != '' && inputs.report-tag || github.job }}]
-        path: "${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-sbom.json"
+        path: |
+          ${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-sbom.json
+          ${{ inputs.report-tag != '' && inputs.report-tag || github.job }}-sbom.csv
         retention-days: ${{ inputs.report-retention-days }}
 
       # https://github.com/aquasecurity/trivy-action
