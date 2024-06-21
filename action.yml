@@ -104,10 +104,12 @@ runs:
       run: |
         cp ${{ inputs.scan-ref }} ${{ env.REPORT_SLUG }}-sbom.json
     - name: Create CSV representation
+      if: "${{ inputs.scan-ref == '' }}"
       shell: bash
       run: |
         cyclonedx-cli convert --input-file ${{ env.REPORT_SLUG }}-sbom.json --output-file ${{ env.REPORT_SLUG }}-sbom.csv --output-format csv
     - name: Upload SBOM
+      if: "${{ inputs.scan-ref == '' }}"
       uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
       with:
         name: SBOM (CycloneDX) [${{ env.REPORT_SLUG }}]
