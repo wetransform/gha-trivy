@@ -1,3 +1,18 @@
+## [2.1.0](https://github.com/wetransform/gha-trivy/compare/v2.0.1...v2.1.0) (2024-06-21)
+
+
+### Features
+
+* make summary creation optional ([5364d6c](https://github.com/wetransform/gha-trivy/commit/5364d6c863a77d2716a3668cbd71dd5ee51b53fc))
+* support using existing SBOM ([607a0c2](https://github.com/wetransform/gha-trivy/commit/607a0c2b8d839bb056c8a6911b1815d945ad5b12))
+
+
+### Bug Fixes
+
+* **deps:** update mikepenz/action-junit-report action to v4.3.0 ([722da5d](https://github.com/wetransform/gha-trivy/commit/722da5d5864cc511b4319b67b87b9c76635bb0cb))
+* don't create artifacts for existing SBOM ([5393f25](https://github.com/wetransform/gha-trivy/commit/5393f255379b342df3046e32c2a21a351bc92791))
+* SBOM should be created even if no JUnit report is created ([8143d9b](https://github.com/wetransform/gha-trivy/commit/8143d9bdfbab79a3fb908e45b614e1782d9abc84))
+
 ## [2.0.1](https://github.com/wetransform/gha-trivy/compare/v2.0.0...v2.0.1) (2024-06-19)
 
 
