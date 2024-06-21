@@ -32,6 +32,9 @@ inputs:
   check-image-user:
     description: If the user of the Docker image should be checked to be non-root
     default: 'true' # Note: Action inputs are always of type string
+  create-summary:
+    description: If a summary should be created
+    default: 'true'
 runs:
   using: "composite"
   steps:
@@ -149,10 +152,12 @@ runs:
         retention-days: ${{ inputs.report-retention-days }}
 
     - name: Copy vulnerability summary template
+      if: ${{ inputs.create-summary == 'true' }}
       shell: bash
       run: |
         cp ${GITHUB_ACTION_PATH}/summary.tpl ./trivy-summary.tpl
     - name: Create summary on vulnerabilities
+      if: ${{ inputs.create-summary == 'true' }}
       uses: aquasecurity/trivy-action@7c2007bcb556501da015201bcba5aa14069b74e2 # 0.23.0
       with:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
@@ -161,6 +166,7 @@ runs:
         template: '@trivy-summary.tpl'
         output: 'trivy.md'
     - name: Add to job summary
+      if: ${{ inputs.create-summary == 'true' }}
       shell: bash
       run: |
         echo "### Vulnerability summary (${{ inputs.image-ref != '' && inputs.image-ref || 'fs' }})" >> $GITHUB_STEP_SUMMARY
