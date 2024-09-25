@@ -56,7 +56,7 @@ runs:
       uses: jaxxstorm/action-install-gh-release@25d5e2dd555cd74f1fab9ac1e6ea117acde2c0c4 # v1.12.0
       with:
         repo: CycloneDX/cyclonedx-cli
-        tag: v0.25.1 # optional, otherwise use latest
+        tag: v0.27.1 # optional, otherwise use latest
 
         # extension-matching: disable # disable extension matching because artifacts are binaries
 
@@ -94,7 +94,7 @@ runs:
       # Approach based on https://github.com/aquasecurity/trivy-action/issues/173#issuecomment-1497774518
     - name: Create SBOM
       if: "${{ inputs.scan-ref == '' }}"
-      uses: aquasecurity/trivy-action@7c2007bcb556501da015201bcba5aa14069b74e2 # 0.23.0
+      uses: aquasecurity/trivy-action@6e7b7d1fd3e4fef0c5fa8cce1229c54b2c9bd0d8 # 0.24.0
       with:
         image-ref: '${{ inputs.image-ref }}'
         scan-type: "${{ inputs.image-ref != '' && 'image' || 'fs' }}"
@@ -123,7 +123,7 @@ runs:
 
       # https://github.com/aquasecurity/trivy-action
     - name: Scan for critical vulnerabilities (create JUnit report)
-      uses: aquasecurity/trivy-action@7c2007bcb556501da015201bcba5aa14069b74e2 # 0.23.0
+      uses: aquasecurity/trivy-action@6e7b7d1fd3e4fef0c5fa8cce1229c54b2c9bd0d8 # 0.24.0
       if: "${{ inputs.junit-test-output != '' || inputs.create-test-report }}"
       with:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
@@ -136,7 +136,7 @@ runs:
         severity: ${{ inputs.fail-for }}
 
     - name: Create vulnerability report as HTML
-      uses: aquasecurity/trivy-action@7c2007bcb556501da015201bcba5aa14069b74e2 # 0.23.0
+      uses: aquasecurity/trivy-action@6e7b7d1fd3e4fef0c5fa8cce1229c54b2c9bd0d8 # 0.24.0
       with:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
         scan-type: sbom
@@ -158,7 +158,7 @@ runs:
         cp ${GITHUB_ACTION_PATH}/summary.tpl ./trivy-summary.tpl
     - name: Create summary on vulnerabilities
       if: ${{ inputs.create-summary == 'true' }}
-      uses: aquasecurity/trivy-action@7c2007bcb556501da015201bcba5aa14069b74e2 # 0.23.0
+      uses: aquasecurity/trivy-action@6e7b7d1fd3e4fef0c5fa8cce1229c54b2c9bd0d8 # 0.24.0
       with:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
         scan-type: sbom
