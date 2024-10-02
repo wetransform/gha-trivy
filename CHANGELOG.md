@@ -1,3 +1,9 @@
+## [2.2.1](https://github.com/wetransform/gha-trivy/compare/v2.2.0...v2.2.1) (2024-10-02)
+
+### Bug Fixes
+
+* ignore error saving trivy cache ([9105dfb](https://github.com/wetransform/gha-trivy/commit/9105dfb41162743904efaac93075001dd6ea4c3f))
+
 ## [2.2.0](https://github.com/wetransform/gha-trivy/compare/v2.1.0...v2.2.0) (2024-09-25)
 
 ### Features
