@@ -190,6 +190,7 @@ runs:
       shell: bash
       run: sudo chown -R $(stat . -c %u:%g) .trivy
     - name: Save trivy cache
+      continue-on-error: true # ignore error (e.g. if cached was already saved in same workflow run)
       if: always() # always save
       id: cache-trivy-save
       uses: actions/cache/save@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
