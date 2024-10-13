@@ -92,7 +92,7 @@ runs:
 
     - name: Restore trivy cache
       id: cache-trivy-restore
-      uses: actions/cache/restore@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2 # v4.1.0
+      uses: actions/cache/restore@3624ceb22c1c5a301c8db4169662070a689d9ea8 # v4.1.1
       with:
         path: .trivy
         key: ${{ runner.os }}-trivy-${{ github.job }}-${{ github.run_id }}
@@ -123,7 +123,7 @@ runs:
         cyclonedx-cli convert --input-file ${{ env.REPORT_SLUG }}-sbom.json --output-file ${{ env.REPORT_SLUG }}-sbom.csv --output-format csv
     - name: Upload SBOM
       if: "${{ inputs.scan-ref == '' }}"
-      uses: actions/upload-artifact@604373da6381bf24206979c74d06a550515601b9 # v4.4.1
+      uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
       with:
         name: SBOM (CycloneDX) [${{ env.REPORT_SLUG }}]
         path: |
@@ -156,7 +156,7 @@ runs:
         output: ${{ env.REPORT_FILENAME }}
         cache-dir: .trivy
     - name: Upload vulnerability report
-      uses: actions/upload-artifact@604373da6381bf24206979c74d06a550515601b9 # v4.4.1
+      uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
       if: always()
       with:
         name: Vulnerability report (HTML) [${{ env.REPORT_SLUG }}]
@@ -193,7 +193,7 @@ runs:
       continue-on-error: true # ignore error (e.g. if cached was already saved in same workflow run)
       if: always() # always save
       id: cache-trivy-save
-      uses: actions/cache/save@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2 # v4.1.0
+      uses: actions/cache/save@3624ceb22c1c5a301c8db4169662070a689d9ea8 # v4.1.1
       with:
         path: .trivy
         key: ${{ steps.cache-trivy-restore.outputs.cache-primary-key }}
