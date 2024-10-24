@@ -1,3 +1,17 @@
+## [2.3.0](https://github.com/wetransform/gha-trivy/compare/v2.2.1...v2.3.0) (2024-10-24)
+
+### Features
+
+* update trivy action and add fallback registry ([498d53a](https://github.com/wetransform/gha-trivy/commit/498d53ae0c052d985678234f220da70e6c2dd53e))
+
+### Bug Fixes
+
+* **deps:** update actions/cache action to v4.1.0 ([34d09a6](https://github.com/wetransform/gha-trivy/commit/34d09a6ae9b2345ff758db5f3e20334a53ee82b2))
+* **deps:** update actions/cache action to v4.1.2 ([f86f716](https://github.com/wetransform/gha-trivy/commit/f86f7164c154ad5f5415394b3e16ae70fd43d75c))
+* **deps:** update actions/upload-artifact action to v4.4.1 ([96ec1ef](https://github.com/wetransform/gha-trivy/commit/96ec1ef15316c4a5832ae36c30a2ffd447682884))
+* **deps:** update all non-major dependencies ([c11af89](https://github.com/wetransform/gha-trivy/commit/c11af89fd67cb3bd8a40c774f6ad495f0330bb61))
+* fix access broken access to default templates after update ([99d93e2](https://github.com/wetransform/gha-trivy/commit/99d93e22d572ee5da64dce5f426adb2b37cd78e6))
+
 ## [2.2.1](https://github.com/wetransform/gha-trivy/compare/v2.2.0...v2.2.1) (2024-10-02)
 
 ### Bug Fixes
