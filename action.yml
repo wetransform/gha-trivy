@@ -103,7 +103,9 @@ runs:
       # Approach based on https://github.com/aquasecurity/trivy-action/issues/173#issuecomment-1497774518
     - name: Create SBOM
       if: "${{ inputs.scan-ref == '' }}"
-      uses: aquasecurity/trivy-action@6e7b7d1fd3e4fef0c5fa8cce1229c54b2c9bd0d8 # 0.24.0
+      uses: aquasecurity/trivy-action@915b19bbe73b92a6cf82a1bc12b087c9a19a5fe2 # 0.28.0
+      env:
+        TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
       with:
         image-ref: '${{ inputs.image-ref }}'
         scan-type: "${{ inputs.image-ref != '' && 'image' || 'fs' }}"
@@ -111,6 +113,7 @@ runs:
         template: '@/contrib/junit.tpl'
         output: "${{ env.REPORT_SLUG }}-sbom.json"
         cache-dir: .trivy
+        cache: 'false' # use our own cache handling
     - name: Use existing SBOM
       if: "${{ inputs.scan-ref != '' }}"
       shell: bash
@@ -133,8 +136,10 @@ runs:
 
       # https://github.com/aquasecurity/trivy-action
     - name: Scan for critical vulnerabilities (create JUnit report)
-      uses: aquasecurity/trivy-action@6e7b7d1fd3e4fef0c5fa8cce1229c54b2c9bd0d8 # 0.24.0
+      uses: aquasecurity/trivy-action@915b19bbe73b92a6cf82a1bc12b087c9a19a5fe2 # 0.28.0
       if: "${{ inputs.junit-test-output != '' || inputs.create-test-report }}"
+      env:
+        TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
       with:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
         scan-type: sbom
@@ -145,9 +150,12 @@ runs:
         vuln-type: 'os,library'
         severity: ${{ inputs.fail-for }}
         cache-dir: .trivy
+        cache: 'false' # use our own cache handling
 
     - name: Create vulnerability report as HTML
-      uses: aquasecurity/trivy-action@6e7b7d1fd3e4fef0c5fa8cce1229c54b2c9bd0d8 # 0.24.0
+      uses: aquasecurity/trivy-action@915b19bbe73b92a6cf82a1bc12b087c9a19a5fe2 # 0.28.0
+      env:
+        TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
       with:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
         scan-type: sbom
@@ -155,6 +163,7 @@ runs:
         template: '@/contrib/html.tpl'
         output: ${{ env.REPORT_FILENAME }}
         cache-dir: .trivy
+        cache: 'false' # use our own cache handling
     - name: Upload vulnerability report
       uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
       if: always()
@@ -170,7 +179,9 @@ runs:
         cp ${GITHUB_ACTION_PATH}/summary.tpl ./trivy-summary.tpl
     - name: Create summary on vulnerabilities
       if: ${{ inputs.create-summary == 'true' }}
-      uses: aquasecurity/trivy-action@6e7b7d1fd3e4fef0c5fa8cce1229c54b2c9bd0d8 # 0.24.0
+      uses: aquasecurity/trivy-action@915b19bbe73b92a6cf82a1bc12b087c9a19a5fe2 # 0.28.0
+      env:
+        TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
       with:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
         scan-type: sbom
@@ -178,6 +189,7 @@ runs:
         template: '@trivy-summary.tpl'
         output: 'trivy.md'
         cache-dir: .trivy
+        cache: 'false' # use our own cache handling
     - name: Add to job summary
       if: ${{ inputs.create-summary == 'true' }}
       shell: bash
