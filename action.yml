@@ -110,7 +110,6 @@ runs:
         image-ref: '${{ inputs.image-ref }}'
         scan-type: "${{ inputs.image-ref != '' && 'image' || 'fs' }}"
         format: 'cyclonedx' # spdx-json
-        template: '@/contrib/junit.tpl'
         output: "${{ env.REPORT_SLUG }}-sbom.json"
         cache-dir: .trivy
         cache: 'false' # use our own cache handling
@@ -136,7 +135,8 @@ runs:
 
       # https://github.com/aquasecurity/trivy-action
     - name: Scan for critical vulnerabilities (create JUnit report)
-      uses: aquasecurity/trivy-action@915b19bbe73b92a6cf82a1bc12b087c9a19a5fe2 # 0.28.0
+      # FIXME - commit that includes fix for contrib templates not being available - TODO update to release after 0.28.0
+      uses: aquasecurity/trivy-action@5db2d16b8382c28106414921787db698dd31f586
       if: "${{ inputs.junit-test-output != '' || inputs.create-test-report }}"
       env:
         TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
@@ -144,7 +144,7 @@ runs:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
         scan-type: sbom
         format: 'template'
-        template: '@/contrib/junit.tpl'
+        template: '@$HOME/.local/bin/trivy-bin/contrib/junit.tpl'
         output: "${{ inputs.junit-test-output != '' && inputs.junit-test-output || 'trivy.xml' }}"
         ignore-unfixed: true
         vuln-type: 'os,library'
@@ -153,14 +153,15 @@ runs:
         cache: 'false' # use our own cache handling
 
     - name: Create vulnerability report as HTML
-      uses: aquasecurity/trivy-action@915b19bbe73b92a6cf82a1bc12b087c9a19a5fe2 # 0.28.0
+      # FIXME - commit that includes fix for contrib templates not being available - TODO update to release after 0.28.0
+      uses: aquasecurity/trivy-action@5db2d16b8382c28106414921787db698dd31f586
       env:
         TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
       with:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
         scan-type: sbom
         format: 'template'
-        template: '@/contrib/html.tpl'
+        template: '@$HOME/.local/bin/trivy-bin/contrib/html.tpl'
         output: ${{ env.REPORT_FILENAME }}
         cache-dir: .trivy
         cache: 'false' # use our own cache handling
