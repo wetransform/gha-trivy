@@ -105,7 +105,8 @@ runs:
       if: "${{ inputs.scan-ref == '' }}"
       uses: aquasecurity/trivy-action@915b19bbe73b92a6cf82a1bc12b087c9a19a5fe2 # 0.28.0
       env:
-        TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
+        TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db,docker.io/aquasecurity/trivy-db,ghcr.io/aquasecurity/trivy-db
+        TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db,docker.io/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db
       with:
         image-ref: '${{ inputs.image-ref }}'
         scan-type: "${{ inputs.image-ref != '' && 'image' || 'fs' }}"
@@ -139,7 +140,8 @@ runs:
       uses: aquasecurity/trivy-action@5db2d16b8382c28106414921787db698dd31f586
       if: "${{ inputs.junit-test-output != '' || inputs.create-test-report }}"
       env:
-        TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
+        TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db,docker.io/aquasecurity/trivy-db,ghcr.io/aquasecurity/trivy-db
+        TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db,docker.io/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db
       with:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
         scan-type: sbom
@@ -156,7 +158,8 @@ runs:
       # FIXME - commit that includes fix for contrib templates not being available - TODO update to release after 0.28.0
       uses: aquasecurity/trivy-action@5db2d16b8382c28106414921787db698dd31f586
       env:
-        TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
+        TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db,docker.io/aquasecurity/trivy-db,ghcr.io/aquasecurity/trivy-db
+        TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db,docker.io/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db
       with:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
         scan-type: sbom
@@ -182,7 +185,8 @@ runs:
       if: ${{ inputs.create-summary == 'true' }}
       uses: aquasecurity/trivy-action@915b19bbe73b92a6cf82a1bc12b087c9a19a5fe2 # 0.28.0
       env:
-        TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
+        TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db,docker.io/aquasecurity/trivy-db,ghcr.io/aquasecurity/trivy-db
+        TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db,docker.io/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db
       with:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
         scan-type: sbom
