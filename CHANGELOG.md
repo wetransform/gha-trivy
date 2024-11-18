@@ -1,3 +1,11 @@
+## [2.3.1](https://github.com/wetransform/gha-trivy/compare/v2.3.0...v2.3.1) (2024-11-18)
+
+### Bug Fixes
+
+* **deps:** update jaxxstorm/action-install-gh-release action to v1.13.0 ([95c3841](https://github.com/wetransform/gha-trivy/commit/95c3841501f706816e146c81f926ce99617f3afa))
+* **deps:** update mikepenz/action-junit-report action to v5 ([0267604](https://github.com/wetransform/gha-trivy/commit/0267604aaee5f514156ef0022c2cce84ca31c5fa))
+* use alternate repos also for Java DB, don't default to ghcr ([a831eea](https://github.com/wetransform/gha-trivy/commit/a831eea10581e55c6f017e1a34c76545b0a02928))
+
 ## [2.3.0](https://github.com/wetransform/gha-trivy/compare/v2.2.1...v2.3.0) (2024-10-24)
 
 ### Features
