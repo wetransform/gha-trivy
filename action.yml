@@ -103,10 +103,7 @@ runs:
       # Approach based on https://github.com/aquasecurity/trivy-action/issues/173#issuecomment-1497774518
     - name: Create SBOM
       if: "${{ inputs.scan-ref == '' }}"
-      uses: aquasecurity/trivy-action@915b19bbe73b92a6cf82a1bc12b087c9a19a5fe2 # 0.28.0
-      env:
-        TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db,docker.io/aquasecurity/trivy-db,ghcr.io/aquasecurity/trivy-db
-        TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db,docker.io/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db
+      uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 # 0.29.0
       with:
         image-ref: '${{ inputs.image-ref }}'
         scan-type: "${{ inputs.image-ref != '' && 'image' || 'fs' }}"
@@ -136,12 +133,8 @@ runs:
 
       # https://github.com/aquasecurity/trivy-action
     - name: Scan for critical vulnerabilities (create JUnit report)
-      # FIXME - commit that includes fix for contrib templates not being available - TODO update to release after 0.28.0
-      uses: aquasecurity/trivy-action@5db2d16b8382c28106414921787db698dd31f586
+      uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 # 0.29.0
       if: "${{ inputs.junit-test-output != '' || inputs.create-test-report }}"
-      env:
-        TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db,docker.io/aquasecurity/trivy-db,ghcr.io/aquasecurity/trivy-db
-        TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db,docker.io/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db
       with:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
         scan-type: sbom
@@ -155,11 +148,7 @@ runs:
         cache: 'false' # use our own cache handling
 
     - name: Create vulnerability report as HTML
-      # FIXME - commit that includes fix for contrib templates not being available - TODO update to release after 0.28.0
-      uses: aquasecurity/trivy-action@5db2d16b8382c28106414921787db698dd31f586
-      env:
-        TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db,docker.io/aquasecurity/trivy-db,ghcr.io/aquasecurity/trivy-db
-        TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db,docker.io/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db
+      uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 # 0.29.0
       with:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
         scan-type: sbom
@@ -183,10 +172,7 @@ runs:
         cp ${GITHUB_ACTION_PATH}/summary.tpl ./trivy-summary.tpl
     - name: Create summary on vulnerabilities
       if: ${{ inputs.create-summary == 'true' }}
-      uses: aquasecurity/trivy-action@915b19bbe73b92a6cf82a1bc12b087c9a19a5fe2 # 0.28.0
-      env:
-        TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db,docker.io/aquasecurity/trivy-db,ghcr.io/aquasecurity/trivy-db
-        TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db,docker.io/aquasecurity/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db
+      uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 # 0.29.0
       with:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
         scan-type: sbom
