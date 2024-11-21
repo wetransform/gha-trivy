@@ -1,3 +1,10 @@
+## [2.3.2](https://github.com/wetransform/gha-trivy/compare/v2.3.1...v2.3.2) (2024-11-21)
+
+### Bug Fixes
+
+* **deps:** update trivy action to 0.29.0 ([a91c1fd](https://github.com/wetransform/gha-trivy/commit/a91c1fd8a8a59ab3676e8eca8221a02f40b25fcc))
+* reset default values to fix HTML report and summary ([5aa87a1](https://github.com/wetransform/gha-trivy/commit/5aa87a1ba4259d21fe77ddaf511abe78da63a3df))
+
 ## [2.3.1](https://github.com/wetransform/gha-trivy/compare/v2.3.0...v2.3.1) (2024-11-18)
 
 ### Bug Fixes
