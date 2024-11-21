@@ -149,6 +149,11 @@ runs:
 
     - name: Create vulnerability report as HTML
       uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 # 0.29.0
+      env:
+        # workaround for trivy action not setting env variables if they use the default value
+        # we need to set the environment manually to the defaults to override previous settings
+        TRIVY_SEVERITY: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+        TRIVY_IGNORE_UNFIXED: "false"
       with:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
         scan-type: sbom
@@ -173,6 +178,11 @@ runs:
     - name: Create summary on vulnerabilities
       if: ${{ inputs.create-summary == 'true' }}
       uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 # 0.29.0
+      env:
+        # workaround for trivy action not setting env variables if they use the default value
+        # we need to set the environment manually to the defaults to override previous settings
+        TRIVY_SEVERITY: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+        TRIVY_IGNORE_UNFIXED: "false"
       with:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
         scan-type: sbom
