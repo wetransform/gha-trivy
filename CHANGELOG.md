@@ -1,3 +1,9 @@
+## [2.3.3](https://github.com/wetransform/gha-trivy/compare/v2.3.2...v2.3.3) (2024-12-09)
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([9365e90](https://github.com/wetransform/gha-trivy/commit/9365e90bb2af5775bde826b1883e5008ea785804))
+
 ## [2.3.2](https://github.com/wetransform/gha-trivy/compare/v2.3.1...v2.3.2) (2024-11-21)
 
 ### Bug Fixes
