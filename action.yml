@@ -123,7 +123,7 @@ runs:
         cyclonedx-cli convert --input-file ${{ env.REPORT_SLUG }}-sbom.json --output-file ${{ env.REPORT_SLUG }}-sbom.csv --output-format csv
     - name: Upload SBOM
       if: "${{ inputs.scan-ref == '' }}"
-      uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
+      uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
       with:
         name: SBOM (CycloneDX) [${{ env.REPORT_SLUG }}]
         path: |
@@ -163,7 +163,7 @@ runs:
         cache-dir: .trivy
         cache: 'false' # use our own cache handling
     - name: Upload vulnerability report
-      uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
+      uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
       if: always()
       with:
         name: Vulnerability report (HTML) [${{ env.REPORT_SLUG }}]
