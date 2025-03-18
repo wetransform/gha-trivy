@@ -1,3 +1,15 @@
+## [2.3.4](https://github.com/wetransform/gha-trivy/compare/v2.3.3...v2.3.4) (2025-03-18)
+
+### Bug Fixes
+
+* **deps:** update actions/cache action to v4.2.2 ([15dc92a](https://github.com/wetransform/gha-trivy/commit/15dc92a947e0fd6646119c4027fe24f78bb70b19))
+* **deps:** update actions/upload-artifact action to v4.5.0 ([2b0534f](https://github.com/wetransform/gha-trivy/commit/2b0534f239676cf2d24393b70665be40917592ed))
+* **deps:** update actions/upload-artifact action to v4.6.0 ([a5d810f](https://github.com/wetransform/gha-trivy/commit/a5d810f9d6380f8d7e29f606288523d95ed41881))
+* **deps:** update all non-major dependencies ([4c552db](https://github.com/wetransform/gha-trivy/commit/4c552db068c3d316107cf97eae2406bfc49c55b0))
+* **deps:** update all non-major dependencies ([af00c15](https://github.com/wetransform/gha-trivy/commit/af00c15326cdaf88f14635c06b9532251a82a748))
+* **deps:** update mikepenz/action-junit-report action to v5.2.0 ([2644a59](https://github.com/wetransform/gha-trivy/commit/2644a5958a974b9dd32bf33ade32f87b83acf744))
+* **deps:** update mikepenz/action-junit-report action to v5.3.0 ([8ab25e6](https://github.com/wetransform/gha-trivy/commit/8ab25e60d01a690b6b376c3bae5a01bf34b087ad))
+
 ## [2.3.3](https://github.com/wetransform/gha-trivy/compare/v2.3.2...v2.3.3) (2024-12-09)
 
 ### Bug Fixes
