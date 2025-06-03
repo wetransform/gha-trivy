@@ -1,3 +1,12 @@
+## [2.3.5](https://github.com/wetransform/gha-trivy/compare/v2.3.4...v2.3.5) (2025-06-03)
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([9ff0a21](https://github.com/wetransform/gha-trivy/commit/9ff0a21ed23fcf175c083154f151b96cd5b04212))
+* **deps:** update aquasecurity/trivy-action action to v0.31.0 ([cedce52](https://github.com/wetransform/gha-trivy/commit/cedce52073483decbdeec06963e2e8e91a5db53b))
+* **deps:** update mikepenz/action-junit-report action to v5.5.1 ([6e43b11](https://github.com/wetransform/gha-trivy/commit/6e43b11cecee5402210dbacb501da001e7ec1910))
+* **deps:** update mikepenz/action-junit-report action to v5.6.0 ([a337d52](https://github.com/wetransform/gha-trivy/commit/a337d522bd6b2579cf65607b18eccf4e8a2cd965))
+
 ## [2.3.4](https://github.com/wetransform/gha-trivy/compare/v2.3.3...v2.3.4) (2025-03-18)
 
 ### Bug Fixes
