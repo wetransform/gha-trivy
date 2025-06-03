@@ -103,7 +103,7 @@ runs:
       # Approach based on https://github.com/aquasecurity/trivy-action/issues/173#issuecomment-1497774518
     - name: Create SBOM
       if: "${{ inputs.scan-ref == '' }}"
-      uses: aquasecurity/trivy-action@6c175e9c4083a92bbca2f9724c8a5e33bc2d97a5 # 0.30.0
+      uses: aquasecurity/trivy-action@76071ef0d7ec797419534a183b498b4d6366cf37 # 0.31.0
       with:
         image-ref: '${{ inputs.image-ref }}'
         scan-type: "${{ inputs.image-ref != '' && 'image' || 'fs' }}"
@@ -133,7 +133,7 @@ runs:
 
       # https://github.com/aquasecurity/trivy-action
     - name: Scan for critical vulnerabilities (create JUnit report)
-      uses: aquasecurity/trivy-action@6c175e9c4083a92bbca2f9724c8a5e33bc2d97a5 # 0.30.0
+      uses: aquasecurity/trivy-action@76071ef0d7ec797419534a183b498b4d6366cf37 # 0.31.0
       if: "${{ inputs.junit-test-output != '' || inputs.create-test-report }}"
       with:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
@@ -148,7 +148,7 @@ runs:
         cache: 'false' # use our own cache handling
 
     - name: Create vulnerability report as HTML
-      uses: aquasecurity/trivy-action@6c175e9c4083a92bbca2f9724c8a5e33bc2d97a5 # 0.30.0
+      uses: aquasecurity/trivy-action@76071ef0d7ec797419534a183b498b4d6366cf37 # 0.31.0
       env:
         # workaround for trivy action not setting env variables if they use the default value
         # we need to set the environment manually to the defaults to override previous settings
@@ -177,7 +177,7 @@ runs:
         cp ${GITHUB_ACTION_PATH}/summary.tpl ./trivy-summary.tpl
     - name: Create summary on vulnerabilities
       if: ${{ inputs.create-summary == 'true' }}
-      uses: aquasecurity/trivy-action@6c175e9c4083a92bbca2f9724c8a5e33bc2d97a5 # 0.30.0
+      uses: aquasecurity/trivy-action@76071ef0d7ec797419534a183b498b4d6366cf37 # 0.31.0
       env:
         # workaround for trivy action not setting env variables if they use the default value
         # we need to set the environment manually to the defaults to override previous settings
