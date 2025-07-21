@@ -1,3 +1,10 @@
+## [2.3.6](https://github.com/wetransform/gha-trivy/compare/v2.3.5...v2.3.6) (2025-07-21)
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([3f234aa](https://github.com/wetransform/gha-trivy/commit/3f234aa2e657ecdd5a9696be3856512c1a9ec106))
+* **deps:** update mikepenz/action-junit-report action to v5.6.1 ([220b147](https://github.com/wetransform/gha-trivy/commit/220b14757c89da0a7d4052e3b0e2c5652fc6d2bd))
+
 ## [2.3.5](https://github.com/wetransform/gha-trivy/compare/v2.3.4...v2.3.5) (2025-06-03)
 
 ### Bug Fixes
