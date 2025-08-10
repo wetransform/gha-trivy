@@ -56,7 +56,7 @@ runs:
       uses: jaxxstorm/action-install-gh-release@cd6b2b78ad38bdd294341cda064ec0692b06215b # v1.14.0
       with:
         repo: CycloneDX/cyclonedx-cli
-        tag: v0.27.1 # optional, otherwise use latest
+        tag: v0.29.0 # optional, otherwise use latest
 
         # extension-matching: disable # disable extension matching because artifacts are binaries
 
@@ -92,7 +92,7 @@ runs:
 
     - name: Restore trivy cache
       id: cache-trivy-restore
-      uses: actions/cache/restore@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
       with:
         path: .trivy
         key: ${{ runner.os }}-trivy-${{ github.job }}-${{ github.run_id }}
@@ -206,7 +206,7 @@ runs:
       continue-on-error: true # ignore error (e.g. if cached was already saved in same workflow run)
       if: always() # always save
       id: cache-trivy-save
-      uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
       with:
         path: .trivy
         key: ${{ steps.cache-trivy-restore.outputs.cache-primary-key }}
