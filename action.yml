@@ -56,7 +56,7 @@ runs:
       uses: jaxxstorm/action-install-gh-release@cd6b2b78ad38bdd294341cda064ec0692b06215b # v1.14.0
       with:
         repo: CycloneDX/cyclonedx-cli
-        tag: v0.29.0 # optional, otherwise use latest
+        tag: v0.29.1 # optional, otherwise use latest
 
         # extension-matching: disable # disable extension matching because artifacts are binaries
 
