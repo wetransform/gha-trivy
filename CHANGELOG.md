@@ -1,3 +1,12 @@
+## [2.3.7](https://github.com/wetransform/gha-trivy/compare/v2.3.6...v2.3.7) (2025-09-10)
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([ee2cd12](https://github.com/wetransform/gha-trivy/commit/ee2cd12373cf2920cdaf5432d4326f39ebb16274))
+* **deps:** update aquasecurity/trivy-action action to v0.33.0 ([643f64d](https://github.com/wetransform/gha-trivy/commit/643f64d5b790b4df1000bbed07243e12c6bfa646))
+* **deps:** update aquasecurity/trivy-action action to v0.33.1 ([b355ffd](https://github.com/wetransform/gha-trivy/commit/b355ffdedf2b6ab68282e684cc385924c6838bba))
+* **deps:** update dependency cyclonedx/cyclonedx-cli to v0.29.1 ([fccd896](https://github.com/wetransform/gha-trivy/commit/fccd89616b46f493603cd994785932a2826d1d9e))
+
 ## [2.3.6](https://github.com/wetransform/gha-trivy/compare/v2.3.5...v2.3.6) (2025-07-21)
 
 ### Bug Fixes
