@@ -39,6 +39,26 @@ runs:
   using: "composite"
   steps:
 
+    # Detect Trivy config and ignore files if present
+    # Note: During testing, support for .trivyignore files in YAML format did not work - it seems as this is still an experimental feature of trivy
+    #       it should be avoided to use YAML format for .trivyignore files for now
+    - name: Detect Trivy config files
+      id: detect-trivy-config
+      shell: bash
+      run: |
+        # Detect trivy.yaml
+        if [ -f "trivy.yaml" ]; then
+          echo "TRIVY_CONFIG_PATH=trivy.yaml" >> $GITHUB_ENV
+        fi
+        # Detect .trivyignore* (prefer yaml/yml, fallback to .trivyignore)
+        if [ -f ".trivyignore.yaml" ]; then
+          echo "TRIVY_IGNORES_PATH=.trivyignore.yaml" >> $GITHUB_ENV
+        elif [ -f ".trivyignore.yml" ]; then
+          echo "TRIVY_IGNORES_PATH=.trivyignore.yml" >> $GITHUB_ENV
+        elif [ -f ".trivyignore" ]; then
+          echo "TRIVY_IGNORES_PATH=.trivyignore" >> $GITHUB_ENV
+        fi
+
     - name: Determine valid report slug and file name
       shell: bash
       run: |
@@ -111,6 +131,8 @@ runs:
         output: "${{ env.REPORT_SLUG }}-sbom.json"
         cache-dir: .trivy
         cache: 'false' # use our own cache handling
+        trivy-config: ${{ env.TRIVY_CONFIG_PATH }}
+        trivyignores: ${{ env.TRIVY_IGNORES_PATH }}
     - name: Use existing SBOM
       if: "${{ inputs.scan-ref != '' }}"
       shell: bash
@@ -146,6 +168,8 @@ runs:
         severity: ${{ inputs.fail-for }}
         cache-dir: .trivy
         cache: 'false' # use our own cache handling
+        trivy-config: ${{ env.TRIVY_CONFIG_PATH }}
+        trivyignores: ${{ env.TRIVY_IGNORES_PATH }}
 
     - name: Create vulnerability report as HTML
       uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
@@ -162,6 +186,8 @@ runs:
         output: ${{ env.REPORT_FILENAME }}
         cache-dir: .trivy
         cache: 'false' # use our own cache handling
+        trivy-config: ${{ env.TRIVY_CONFIG_PATH }}
+        trivyignores: ${{ env.TRIVY_IGNORES_PATH }}
     - name: Upload vulnerability report
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       if: always()
@@ -191,6 +217,8 @@ runs:
         output: 'trivy.md'
         cache-dir: .trivy
         cache: 'false' # use our own cache handling
+        trivy-config: ${{ env.TRIVY_CONFIG_PATH }}
+        trivyignores: ${{ env.TRIVY_IGNORES_PATH }}
     - name: Add to job summary
       if: ${{ inputs.create-summary == 'true' }}
       shell: bash
