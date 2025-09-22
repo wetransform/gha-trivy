@@ -1,3 +1,9 @@
+## [2.4.0](https://github.com/wetransform/gha-trivy/compare/v2.3.7...v2.4.0) (2025-09-22)
+
+### Features
+
+* automatically use trivy.yaml and trivyignore file in repo root ([526ad7f](https://github.com/wetransform/gha-trivy/commit/526ad7ffc687ea5044da026455db437fcf0cfe3c))
+
 ## [2.3.7](https://github.com/wetransform/gha-trivy/compare/v2.3.6...v2.3.7) (2025-09-10)
 
 ### Bug Fixes
