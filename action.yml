@@ -12,6 +12,10 @@ inputs:
     description: Existing SBOM to use, if set image-ref is ignored
     required: false
     default: ''
+  upload-scan-ref:
+    description: If the existing SBOM used for scanning should be uploaded as an artifact
+    required: false
+    default: 'false' # Note: Action inputs are always of type string
   junit-test-output:
     description: Location to write JUnit test report to
     required: false
@@ -139,12 +143,12 @@ runs:
       run: |
         cp ${{ inputs.scan-ref }} ${{ env.REPORT_SLUG }}-sbom.json
     - name: Create CSV representation
-      if: "${{ inputs.scan-ref == '' }}"
+      if: "${{ inputs.scan-ref == '' || inputs.upload-scan-ref == 'true' }}"
       shell: bash
       run: |
         cyclonedx-cli convert --input-file ${{ env.REPORT_SLUG }}-sbom.json --output-file ${{ env.REPORT_SLUG }}-sbom.csv --output-format csv
     - name: Upload SBOM
-      if: "${{ inputs.scan-ref == '' }}"
+      if: "${{ inputs.scan-ref == '' || inputs.upload-scan-ref == 'true' }}"
       uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
       with:
         name: SBOM (CycloneDX) [${{ env.REPORT_SLUG }}]
