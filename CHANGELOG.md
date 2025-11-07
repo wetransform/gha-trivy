@@ -1,3 +1,17 @@
+## [2.5.0](https://github.com/wetransform/gha-trivy/compare/v2.4.0...v2.5.0) (2025-11-07)
+
+### Features
+
+* add option to upload existing SBOM as artifacts ([a427bea](https://github.com/wetransform/gha-trivy/commit/a427bea3ef11f229b0e4c4addeeeb00896525d6f))
+* support reading fail-for from file ([f4d4db6](https://github.com/wetransform/gha-trivy/commit/f4d4db66d3c2856ab34c2da71d50b6649168db48))
+
+### Bug Fixes
+
+* **deps:** update actions/cache action to v4.3.0 ([adaa752](https://github.com/wetransform/gha-trivy/commit/adaa7523d25efba667a7cf434a7b70bd46485e40))
+* **deps:** update actions/upload-artifact action to v5 ([cb9b414](https://github.com/wetransform/gha-trivy/commit/cb9b4141b315aa0db74cb53ff57c5f0ebf416114))
+* **deps:** update mikepenz/action-junit-report action to v6 ([5126e56](https://github.com/wetransform/gha-trivy/commit/5126e562c90677bc27283ce178328dd4e76252c0))
+* **deps:** update mikepenz/action-junit-report action to v6.0.1 ([09f5b4c](https://github.com/wetransform/gha-trivy/commit/09f5b4c285d2a7eee225a2b7e8388f76660663f5))
+
 ## [2.4.0](https://github.com/wetransform/gha-trivy/compare/v2.3.7...v2.4.0) (2025-09-22)
 
 ### Features
