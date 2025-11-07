@@ -26,7 +26,7 @@ inputs:
     default: 'false' # Note: Action inputs are always of type string
   fail-for:
     description: Issue types for fail for if they are present (added to JUnit report)
-    default: CRITICAL
+    default: '' # e.g. CRITICAL,HIGH
   report-retention-days:
     description: Number of days to retain the HTML report
     default: 30
@@ -61,6 +61,41 @@ runs:
           echo "TRIVY_IGNORES_PATH=.trivyignore.yml" >> $GITHUB_ENV
         elif [ -f ".trivyignore" ]; then
           echo "TRIVY_IGNORES_PATH=.trivyignore" >> $GITHUB_ENV
+        fi
+
+    # Determine effective fail-for value (may come from file if not explicitly set)
+    # For convenience, only the lowest severity needs to be specified in the file
+    - name: Determine fail-for severity
+      id: determine-fail-for
+      shell: bash
+      run: |
+        # If fail-for is set, use it directly
+        if [ "${{ inputs.fail-for }}" != "" ]; then
+          echo "FAIL_FOR_EFFECTIVE=${{ inputs.fail-for }}" >> $GITHUB_ENV
+        else
+          # If .trivy-fail-for exists, map its content
+          if [ -f ".trivy-fail-for" ]; then
+            SEVERITY=$(cat .trivy-fail-for | tr -d '\n' | xargs)
+            SEVERITY_UPPER=$(echo "$SEVERITY" | tr '[:lower:]' '[:upper:]')
+            case "$SEVERITY_UPPER" in
+              CRITICAL)
+                FAIL_FOR="CRITICAL" ;;
+              HIGH)
+                FAIL_FOR="CRITICAL,HIGH" ;;
+              MEDIUM)
+                FAIL_FOR="CRITICAL,HIGH,MEDIUM" ;;
+              LOW)
+                FAIL_FOR="CRITICAL,HIGH,MEDIUM,LOW" ;;
+              *)
+                echo "::error::Unrecognized severity value in .trivy-fail-for: '$SEVERITY'" >&2
+                exit 1
+                ;;
+            esac
+            echo "FAIL_FOR_EFFECTIVE=$FAIL_FOR" >> $GITHUB_ENV
+          else
+            # Default to CRITICAL (original behavior)
+            echo "FAIL_FOR_EFFECTIVE=CRITICAL" >> $GITHUB_ENV
+          fi
         fi
 
     - name: Determine valid report slug and file name
@@ -169,7 +204,7 @@ runs:
         output: "${{ inputs.junit-test-output != '' && inputs.junit-test-output || 'trivy.xml' }}"
         ignore-unfixed: true
         vuln-type: 'os,library'
-        severity: ${{ inputs.fail-for }}
+        severity: ${{ env.FAIL_FOR_EFFECTIVE }}
         cache-dir: .trivy
         cache: 'false' # use our own cache handling
         trivy-config: ${{ env.TRIVY_CONFIG_PATH }}
