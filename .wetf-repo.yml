@@ -6,3 +6,6 @@ presets:
   - github-actions
   - renovate-config
   - workflows-default
+
+required_checks:
+  - check
