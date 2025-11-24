@@ -149,6 +149,13 @@ runs:
     # Scan for security vulnerabilities
     #
 
+    - name: Install Trivy
+      uses: aquasecurity/setup-trivy@v0.2.4
+      with:
+        # renovate: datasource=github-tags depName=aquasecurity/trivy
+        version: v0.65.0
+        cache: true
+
     - name: Restore trivy cache
       id: cache-trivy-restore
       uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
@@ -172,6 +179,7 @@ runs:
         cache: 'false' # use our own cache handling
         trivy-config: ${{ env.TRIVY_CONFIG_PATH }}
         trivyignores: ${{ env.TRIVY_IGNORES_PATH }}
+        skip-setup-trivy: true
     - name: Use existing SBOM
       if: "${{ inputs.scan-ref != '' }}"
       shell: bash
@@ -209,6 +217,7 @@ runs:
         cache: 'false' # use our own cache handling
         trivy-config: ${{ env.TRIVY_CONFIG_PATH }}
         trivyignores: ${{ env.TRIVY_IGNORES_PATH }}
+        skip-setup-trivy: true
 
     - name: Create vulnerability report as HTML
       uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
@@ -227,6 +236,7 @@ runs:
         cache: 'false' # use our own cache handling
         trivy-config: ${{ env.TRIVY_CONFIG_PATH }}
         trivyignores: ${{ env.TRIVY_IGNORES_PATH }}
+        skip-setup-trivy: true
     - name: Upload vulnerability report
       uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
       if: always()
@@ -258,6 +268,7 @@ runs:
         cache: 'false' # use our own cache handling
         trivy-config: ${{ env.TRIVY_CONFIG_PATH }}
         trivyignores: ${{ env.TRIVY_IGNORES_PATH }}
+        skip-setup-trivy: true
     - name: Add to job summary
       if: ${{ inputs.create-summary == 'true' }}
       shell: bash
