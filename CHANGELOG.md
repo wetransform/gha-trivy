@@ -1,3 +1,12 @@
+## [2.5.1](https://github.com/wetransform/gha-trivy/compare/v2.5.0...v2.5.1) (2025-11-24)
+
+### Bug Fixes
+
+* **deps:** pin aquasecurity/setup-trivy action to e6c2c5e ([44a0752](https://github.com/wetransform/gha-trivy/commit/44a0752aecf1a3b7da3b369fee3abbbe8fc432cb))
+* **deps:** update actions/checkout action to v6 ([b619856](https://github.com/wetransform/gha-trivy/commit/b61985679527ad7b7c36cae8e01767aeba96d7b5))
+* **deps:** update dependency aquasecurity/trivy to v0.67.2 ([1c69910](https://github.com/wetransform/gha-trivy/commit/1c699102f0a37aaf473a08421c2b03634a328430))
+* install trivy only once ([5fe1ee3](https://github.com/wetransform/gha-trivy/commit/5fe1ee3e64fcaa5a76c4ea36ef20f31cb1d7b289))
+
 ## [2.5.0](https://github.com/wetransform/gha-trivy/compare/v2.4.0...v2.5.0) (2025-11-07)
 
 ### Features
