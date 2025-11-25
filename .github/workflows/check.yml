@@ -2,9 +2,9 @@ name: Test gha-trivy Action
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   check:
@@ -26,5 +26,5 @@ jobs:
         uses: ./
         with:
           image-ref: test-gha-trivy:latest
-          create-test-report: 'true'
-          create-summary: 'true'
+          create-test-report: "true"
+          create-summary: "true"
