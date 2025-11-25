@@ -1,0 +1,5 @@
+[tools]
+hk = "latest"
+pkl = "latest"
+actionlint = "latest"
+prettier = "3"
