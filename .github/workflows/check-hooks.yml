@@ -1,0 +1,18 @@
+name: Check Conventions
+
+on:
+  pull_request:
+
+jobs:
+  check-hooks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up mise
+        uses: jdx/mise-action@v2
+
+      - name: Check conventions with hk
+        run: |
+          hk check --all || { echo 'Convention check failed!'; exit 1; }
