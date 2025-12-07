@@ -152,7 +152,7 @@ runs:
       uses: aquasecurity/setup-trivy@e6c2c5e321ed9123bda567646e2f96565e34abe1 # v0.2.4
       with:
         # renovate: datasource=github-tags depName=aquasecurity/trivy
-        version: v0.67.2
+        version: v0.68.1
         cache: true
 
     - name: Restore trivy cache

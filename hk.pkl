@@ -1,1 +1,2 @@
-amends "https://raw.githubusercontent.com/wetransform/hk-config/refs/tags/v1.0.2/configs/Default.pkl"
+amends
+  "https://raw.githubusercontent.com/wetransform/hk-config/refs/tags/v1.3.2/configs/Default.pkl"
