@@ -1,5 +1,6 @@
 [tools]
 hk = "latest"
 pkl = "latest"
-actionlint = "latest"
-prettier = "3"
+
+[hooks]
+postinstall = "hk install --mise"
