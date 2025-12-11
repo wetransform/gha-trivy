@@ -3,4 +3,5 @@ hk = "latest"
 pkl = "latest"
 
 [hooks]
-postinstall = "hk install --mise"
+enter = "mise x -- hk install --mise"
+postinstall = "mise x -- hk install --mise"
