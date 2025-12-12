@@ -15,6 +15,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+        with:
+          # fetch all history so checks (e.g. gitleaks) can check the full history
+          fetch-depth: 0
 
       - name: Set up mise
         uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
@@ -22,3 +25,9 @@ jobs:
       - name: Run checks
         run: |
           hk check --all
+        env:
+          MISE_ENV: ci
+          # specify profile for CI check where all files are checked
+          HK_PROFILE: ci-check-all
+          # required for some builds, set if available
+          GH_PAT: ${{ secrets.GH_PAT }}
