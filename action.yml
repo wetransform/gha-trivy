@@ -114,7 +114,7 @@ runs:
       uses: jaxxstorm/action-install-gh-release@cd6b2b78ad38bdd294341cda064ec0692b06215b # v1.14.0
       with:
         repo: CycloneDX/cyclonedx-cli
-        tag: v0.29.1 # optional, otherwise use latest
+        tag: v0.29.2 # optional, otherwise use latest
 
         # extension-matching: disable # disable extension matching because artifacts are binaries
 
@@ -152,7 +152,7 @@ runs:
       uses: aquasecurity/setup-trivy@e6c2c5e321ed9123bda567646e2f96565e34abe1 # v0.2.4
       with:
         # renovate: datasource=github-tags depName=aquasecurity/trivy
-        version: v0.68.1
+        version: v0.68.2
         cache: true
 
     - name: Restore trivy cache
