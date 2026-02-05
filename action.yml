@@ -152,12 +152,12 @@ runs:
       uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514 # v0.2.5
       with:
         # renovate: datasource=github-tags depName=aquasecurity/trivy
-        version: v0.68.2
+        version: v0.69.1
         cache: true
 
     - name: Restore trivy cache
       id: cache-trivy-restore
-      uses: actions/cache/restore@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+      uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
       with:
         path: .trivy
         key: ${{ runner.os }}-trivy-${{ github.job }}-${{ github.run_id }}
@@ -283,7 +283,7 @@ runs:
       continue-on-error: true # ignore error (e.g. if cached was already saved in same workflow run)
       if: always() # always save
       id: cache-trivy-save
-      uses: actions/cache/save@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+      uses: actions/cache/save@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
       with:
         path: .trivy
         key: ${{ steps.cache-trivy-restore.outputs.cache-primary-key }}
@@ -294,7 +294,7 @@ runs:
 
     # https://github.com/marketplace/actions/junit-report-action
     - name: Publish Test Report
-      uses: mikepenz/action-junit-report@a294a61c909bd8a4b563024a2faa28897fd53ebc # v6.1.0
+      uses: mikepenz/action-junit-report@74626db7353a25a20a72816467ebf035f674c5f8 # v6.2.0
       if: ${{ always() && inputs.create-test-report == 'true' }} # always run even if the previous step fails
       with:
         report_paths: "${{ inputs.junit-test-output != '' && inputs.junit-test-output || 'trivy.xml' }}*"
