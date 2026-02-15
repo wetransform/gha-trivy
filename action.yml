@@ -114,7 +114,7 @@ runs:
       uses: jaxxstorm/action-install-gh-release@cd6b2b78ad38bdd294341cda064ec0692b06215b # v1.14.0
       with:
         repo: CycloneDX/cyclonedx-cli
-        tag: v0.29.2 # optional, otherwise use latest
+        tag: v0.30.0 # optional, otherwise use latest
 
         # extension-matching: disable # disable extension matching because artifacts are binaries
 
@@ -168,7 +168,7 @@ runs:
       # Approach based on https://github.com/aquasecurity/trivy-action/issues/173#issuecomment-1497774518
     - name: Create SBOM
       if: "${{ inputs.scan-ref == '' }}"
-      uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
+      uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284 # 0.34.0
       with:
         image-ref: "${{ inputs.image-ref }}"
         scan-type: "${{ inputs.image-ref != '' && 'image' || 'fs' }}"
@@ -201,7 +201,7 @@ runs:
 
       # https://github.com/aquasecurity/trivy-action
     - name: Scan for critical vulnerabilities (create JUnit report)
-      uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
+      uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284 # 0.34.0
       if: "${{ inputs.junit-test-output != '' || inputs.create-test-report }}"
       with:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
@@ -219,7 +219,7 @@ runs:
         skip-setup-trivy: true
 
     - name: Create vulnerability report as HTML
-      uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
+      uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284 # 0.34.0
       env:
         # workaround for trivy action not setting env variables if they use the default value
         # we need to set the environment manually to the defaults to override previous settings
@@ -251,7 +251,7 @@ runs:
         cp ${GITHUB_ACTION_PATH}/summary.tpl ./trivy-summary.tpl
     - name: Create summary on vulnerabilities
       if: ${{ inputs.create-summary == 'true' }}
-      uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
+      uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284 # 0.34.0
       env:
         # workaround for trivy action not setting env variables if they use the default value
         # we need to set the environment manually to the defaults to override previous settings
