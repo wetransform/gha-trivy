@@ -155,6 +155,27 @@ runs:
         version: v0.69.3
         cache: true
 
+    - name: Copy Trivy contrib templates
+      shell: bash
+      run: |
+        set -euo pipefail
+        SRC_DIR="$HOME/.local/bin/trivy-bin/contrib"
+
+        if [ ! -f "$SRC_DIR/junit.tpl" ]; then
+          echo "::error::Trivy JUnit template not found at $SRC_DIR/junit.tpl"
+          ls -R "$SRC_DIR" || true
+          exit 1
+        fi
+
+        if [ ! -f "$SRC_DIR/html.tpl" ]; then
+          echo "::error::Trivy HTML template not found at $SRC_DIR/html.tpl"
+          ls -R "$SRC_DIR" || true
+          exit 1
+        fi
+
+        cp "$SRC_DIR/junit.tpl" ./trivy-junit.tpl
+        cp "$SRC_DIR/html.tpl" ./trivy-html.tpl
+
     - name: Restore trivy cache
       id: cache-trivy-restore
       uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
@@ -207,7 +228,7 @@ runs:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
         scan-type: sbom
         format: "template"
-        template: "@$HOME/.local/bin/trivy-bin/contrib/junit.tpl"
+        template: "@trivy-junit.tpl"
         output: "${{ inputs.junit-test-output != '' && inputs.junit-test-output || 'trivy.xml' }}"
         ignore-unfixed: true
         vuln-type: "os,library"
@@ -229,7 +250,7 @@ runs:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
         scan-type: sbom
         format: "template"
-        template: "@$HOME/.local/bin/trivy-bin/contrib/html.tpl"
+        template: "@trivy-html.tpl"
         output: ${{ env.REPORT_FILENAME }}
         cache-dir: .trivy
         cache: "false" # use our own cache handling
