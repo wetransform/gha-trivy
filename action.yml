@@ -152,7 +152,7 @@ runs:
       uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514 # v0.2.5
       with:
         # renovate: datasource=github-releases depName=aquasecurity/trivy
-        version: v0.69.1
+        version: v0.69.3
         cache: true
 
     - name: Restore trivy cache
@@ -168,7 +168,7 @@ runs:
       # Approach based on https://github.com/aquasecurity/trivy-action/issues/173#issuecomment-1497774518
     - name: Create SBOM
       if: "${{ inputs.scan-ref == '' }}"
-      uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284 # 0.34.0
+      uses: aquasecurity/trivy-action@97e0b3872f55f89b95b2f65b3dbab56962816478 # 0.34.2
       with:
         image-ref: "${{ inputs.image-ref }}"
         scan-type: "${{ inputs.image-ref != '' && 'image' || 'fs' }}"
@@ -201,7 +201,7 @@ runs:
 
       # https://github.com/aquasecurity/trivy-action
     - name: Scan for critical vulnerabilities (create JUnit report)
-      uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284 # 0.34.0
+      uses: aquasecurity/trivy-action@97e0b3872f55f89b95b2f65b3dbab56962816478 # 0.34.2
       if: "${{ inputs.junit-test-output != '' || inputs.create-test-report }}"
       with:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
@@ -219,7 +219,7 @@ runs:
         skip-setup-trivy: true
 
     - name: Create vulnerability report as HTML
-      uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284 # 0.34.0
+      uses: aquasecurity/trivy-action@97e0b3872f55f89b95b2f65b3dbab56962816478 # 0.34.2
       env:
         # workaround for trivy action not setting env variables if they use the default value
         # we need to set the environment manually to the defaults to override previous settings
@@ -251,7 +251,7 @@ runs:
         cp ${GITHUB_ACTION_PATH}/summary.tpl ./trivy-summary.tpl
     - name: Create summary on vulnerabilities
       if: ${{ inputs.create-summary == 'true' }}
-      uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284 # 0.34.0
+      uses: aquasecurity/trivy-action@97e0b3872f55f89b95b2f65b3dbab56962816478 # 0.34.2
       env:
         # workaround for trivy action not setting env variables if they use the default value
         # we need to set the environment manually to the defaults to override previous settings
@@ -294,7 +294,7 @@ runs:
 
     # https://github.com/marketplace/actions/junit-report-action
     - name: Publish Test Report
-      uses: mikepenz/action-junit-report@74626db7353a25a20a72816467ebf035f674c5f8 # v6.2.0
+      uses: mikepenz/action-junit-report@49b2ca06f62aa7ef83ae6769a2179271e160d8e4 # v6.3.1
       if: ${{ always() && inputs.create-test-report == 'true' }} # always run even if the previous step fails
       with:
         report_paths: "${{ inputs.junit-test-output != '' && inputs.junit-test-output || 'trivy.xml' }}*"
