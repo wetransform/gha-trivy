@@ -1,3 +1,21 @@
+## [2.5.2](https://github.com/wetransform/gha-trivy/compare/v2.5.1...v2.5.2) (2026-03-03)
+
+### Bug Fixes
+
+* add workaround for inaccessible contrib templates ([5f46f6b](https://github.com/wetransform/gha-trivy/commit/5f46f6be8b119b2ee9661fdd4401e445c213c115))
+* **deps:** update actions/cache action to v5 ([1254e39](https://github.com/wetransform/gha-trivy/commit/1254e39661c58da94f8010267641184bb1207a3f))
+* **deps:** update actions/checkout action to v6 ([b9b9c93](https://github.com/wetransform/gha-trivy/commit/b9b9c93a3a94e3b7df20659cf4ae3de4818f28d0))
+* **deps:** update actions/upload-artifact action to v6 ([14574f6](https://github.com/wetransform/gha-trivy/commit/14574f607f0926b37db4cde03f9f3a0f455d8854))
+* **deps:** update actions/upload-artifact action to v7 ([614a265](https://github.com/wetransform/gha-trivy/commit/614a2652e995e22da1ed342a9c4f7e0d8e9ce34a))
+* **deps:** update all non-major dependencies ([b1299fe](https://github.com/wetransform/gha-trivy/commit/b1299fe5755eeb1cfa043d7b1e966684b4856ca2))
+* **deps:** update all non-major dependencies ([6979b3f](https://github.com/wetransform/gha-trivy/commit/6979b3fe31aac8cd0f02c40b07b5b5085e0c5050))
+* **deps:** update all non-major dependencies ([a50ff2e](https://github.com/wetransform/gha-trivy/commit/a50ff2e299da6e63d5378a167719a1769452fe18))
+* **deps:** update all non-major dependencies ([7f3bd49](https://github.com/wetransform/gha-trivy/commit/7f3bd498d6461b70d6af0ab8653049fd2dcb326d))
+* **deps:** update all non-major dependencies ([c52cf6e](https://github.com/wetransform/gha-trivy/commit/c52cf6eb31d021efc1e8004b64d918988e7096d1))
+* **deps:** update all non-major dependencies ([06a46d0](https://github.com/wetransform/gha-trivy/commit/06a46d0bc4f811384e23c3f5ae65e18dd5b2a822))
+* **deps:** update dependency wetransform/hk-config to v2 ([5374a82](https://github.com/wetransform/gha-trivy/commit/5374a82ff8bdf9f5f07b2001f4e01c673344be8e))
+* **deps:** update jdx/mise-action action to v3 ([33b3a8b](https://github.com/wetransform/gha-trivy/commit/33b3a8be6950cf2d1f3e2ce91958ea85078647b5))
+
 ## [2.5.1](https://github.com/wetransform/gha-trivy/compare/v2.5.0...v2.5.1) (2025-11-24)
 
 ### Bug Fixes
