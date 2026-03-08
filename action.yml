@@ -189,7 +189,7 @@ runs:
       # Approach based on https://github.com/aquasecurity/trivy-action/issues/173#issuecomment-1497774518
     - name: Create SBOM
       if: "${{ inputs.scan-ref == '' }}"
-      uses: aquasecurity/trivy-action@97e0b3872f55f89b95b2f65b3dbab56962816478 # 0.34.2
+      uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
       with:
         image-ref: "${{ inputs.image-ref }}"
         scan-type: "${{ inputs.image-ref != '' && 'image' || 'fs' }}"
@@ -222,7 +222,7 @@ runs:
 
       # https://github.com/aquasecurity/trivy-action
     - name: Scan for critical vulnerabilities (create JUnit report)
-      uses: aquasecurity/trivy-action@97e0b3872f55f89b95b2f65b3dbab56962816478 # 0.34.2
+      uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
       if: "${{ inputs.junit-test-output != '' || inputs.create-test-report }}"
       with:
         scan-ref: "${{ env.REPORT_SLUG }}-sbom.json"
@@ -240,7 +240,7 @@ runs:
         skip-setup-trivy: true
 
     - name: Create vulnerability report as HTML
-      uses: aquasecurity/trivy-action@97e0b3872f55f89b95b2f65b3dbab56962816478 # 0.34.2
+      uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
       env:
         # workaround for trivy action not setting env variables if they use the default value
         # we need to set the environment manually to the defaults to override previous settings
@@ -272,7 +272,7 @@ runs:
         cp ${GITHUB_ACTION_PATH}/summary.tpl ./trivy-summary.tpl
     - name: Create summary on vulnerabilities
       if: ${{ inputs.create-summary == 'true' }}
-      uses: aquasecurity/trivy-action@97e0b3872f55f89b95b2f65b3dbab56962816478 # 0.34.2
+      uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
       env:
         # workaround for trivy action not setting env variables if they use the default value
         # we need to set the environment manually to the defaults to override previous settings
