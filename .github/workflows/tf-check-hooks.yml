@@ -11,6 +11,7 @@ on:
 
 jobs:
   check-hooks:
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
