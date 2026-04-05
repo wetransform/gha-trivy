@@ -111,7 +111,7 @@ runs:
         echo "REPORT_FILENAME=${VALID_SLUG}-trivy.html" >> $GITHUB_ENV
 
     - name: Install CycloneDX CLI # https://github.com/CycloneDX/cyclonedx-cli
-      uses: jaxxstorm/action-install-gh-release@cd6b2b78ad38bdd294341cda064ec0692b06215b # v1.14.0
+      uses: jaxxstorm/action-install-gh-release@25e24d2d23ae098373794ef1d6faecb48ee52da8 # v3.0.0
       with:
         repo: CycloneDX/cyclonedx-cli
         tag: v0.30.0 # optional, otherwise use latest
