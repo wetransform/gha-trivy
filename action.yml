@@ -178,7 +178,7 @@ runs:
 
     - name: Restore trivy cache
       id: cache-trivy-restore
-      uses: actions/cache/restore@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+      uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
       with:
         path: .trivy
         key: ${{ runner.os }}-trivy-${{ github.job }}-${{ github.run_id }}
@@ -304,7 +304,7 @@ runs:
       continue-on-error: true # ignore error (e.g. if cached was already saved in same workflow run)
       if: always() # always save
       id: cache-trivy-save
-      uses: actions/cache/save@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+      uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
       with:
         path: .trivy
         key: ${{ steps.cache-trivy-restore.outputs.cache-primary-key }}
