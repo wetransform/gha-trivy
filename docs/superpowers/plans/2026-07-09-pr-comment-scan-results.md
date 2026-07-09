@@ -34,11 +34,13 @@
 ### Task 1: Pure logic module `scripts/pr-comment.cjs` (+ tests, node/mise setup)
 
 **Files:**
+
 - Create: `scripts/pr-comment.cjs`
 - Test: `scripts/pr-comment.test.cjs`
 - Modify: `mise.toml`
 
 **Interfaces:**
+
 - Produces (all exported from `scripts/pr-comment.cjs`):
   - `SEVERITIES: Array<[key: string, label: string]>` — order: critical, high, medium, low, unknown.
   - `parseMeta(body: string|null|undefined): object|null` — returns the JSON parsed from the first `<!-- gha-trivy-meta:… -->` marker, or `null` if absent/malformed.
@@ -75,97 +77,132 @@ run = "node --test scripts/"
 Create `scripts/pr-comment.test.cjs`:
 
 ```js
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
+const { test } = require("node:test");
+const assert = require("node:assert/strict");
 const {
   parseMeta,
   renderTable,
   computeDeltaLine,
   countsEqual,
   buildBody,
-} = require('./pr-comment.cjs');
+} = require("./pr-comment.cjs");
 
-const counts = (c, h, m, l, u) => ({ critical: c, high: h, medium: m, low: l, unknown: u });
+const counts = (c, h, m, l, u) => ({
+  critical: c,
+  high: h,
+  medium: m,
+  low: l,
+  unknown: u,
+});
 
-test('parseMeta reads the JSON from the marker', () => {
+test("parseMeta reads the JSON from the marker", () => {
   const body = 'hi\n<!-- gha-trivy-meta:{"counts":{"critical":2}} -->\nbye';
   assert.deepEqual(parseMeta(body), { counts: { critical: 2 } });
 });
 
-test('parseMeta returns null when absent or malformed', () => {
-  assert.equal(parseMeta('no marker here'), null);
-  assert.equal(parseMeta(''), null);
+test("parseMeta returns null when absent or malformed", () => {
+  assert.equal(parseMeta("no marker here"), null);
+  assert.equal(parseMeta(""), null);
   assert.equal(parseMeta(undefined), null);
-  assert.equal(parseMeta('<!-- gha-trivy-meta:{bad json} -->'), null);
+  assert.equal(parseMeta("<!-- gha-trivy-meta:{bad json} -->"), null);
 });
 
-test('renderTable renders all severities, missing keys as 0', () => {
+test("renderTable renders all severities, missing keys as 0", () => {
   const t = renderTable({ critical: 1, high: 2 });
   assert.match(t, /\| Critical \| High \| Medium \| Low \| Unknown \|/);
   assert.match(t, /\| 1 \| 2 \| 0 \| 0 \| 0 \|/);
 });
 
-test('computeDeltaLine shows signed deltas and equals', () => {
-  const line = computeDeltaLine(counts(2, 5, 12, 30, 4), counts(3, 5, 10, 30, 4));
-  assert.equal(line, 'Critical 2 (-1) · High 5 (=) · Medium 12 (+2) · Low 30 (=) · Unknown 4 (=)');
+test("computeDeltaLine shows signed deltas and equals", () => {
+  const line = computeDeltaLine(
+    counts(2, 5, 12, 30, 4),
+    counts(3, 5, 10, 30, 4),
+  );
+  assert.equal(
+    line,
+    "Critical 2 (-1) · High 5 (=) · Medium 12 (+2) · Low 30 (=) · Unknown 4 (=)",
+  );
 });
 
-test('computeDeltaLine returns null without previous', () => {
+test("computeDeltaLine returns null without previous", () => {
   assert.equal(computeDeltaLine(counts(1, 0, 0, 0, 0), null), null);
 });
 
-test('countsEqual compares all severities treating missing as 0', () => {
-  assert.equal(countsEqual({ critical: 0, high: 0, medium: 0, low: 0, unknown: 0 }, {}), true);
+test("countsEqual compares all severities treating missing as 0", () => {
+  assert.equal(
+    countsEqual({ critical: 0, high: 0, medium: 0, low: 0, unknown: 0 }, {}),
+    true,
+  );
   assert.equal(countsEqual({ critical: 1 }, { critical: 2 }), false);
   assert.equal(countsEqual(null, {}), false);
 });
 
 const baseOpts = {
-  slug: 'myslug',
-  image: 'myimage:tag',
-  run: { number: 42, url: 'https://run/42' },
-  time: '2026-07-09T10:00:00Z',
+  slug: "myslug",
+  image: "myimage:tag",
+  run: { number: 42, url: "https://run/42" },
+  time: "2026-07-09T10:00:00Z",
   counts: counts(2, 5, 12, 30, 4),
-  links: { run: 'https://run/42', report: 'https://artifact/report', sbom: 'https://artifact/sbom' },
+  links: {
+    run: "https://run/42",
+    report: "https://artifact/report",
+    sbom: "https://artifact/sbom",
+  },
 };
 
-test('buildBody first run: markers, table, links, no delta, no history', () => {
+test("buildBody first run: markers, table, links, no delta, no history", () => {
   const body = buildBody({ ...baseOpts, existingBody: undefined });
   assert.match(body, /<!-- gha-trivy:myslug -->/);
-  assert.match(body, /### Vulnerability summary \(myimage:tag\) — latest: run #42/);
+  assert.match(
+    body,
+    /### Vulnerability summary \(myimage:tag\) — latest: run #42/,
+  );
   assert.match(body, /\| 2 \| 5 \| 12 \| 30 \| 4 \|/);
-  assert.match(body, /Links: \[workflow run\]\(https:\/\/run\/42\) · \[HTML report\]\(https:\/\/artifact\/report\) · \[SBOM\]\(https:\/\/artifact\/sbom\)/);
+  assert.match(
+    body,
+    /Links: \[workflow run\]\(https:\/\/run\/42\) · \[HTML report\]\(https:\/\/artifact\/report\) · \[SBOM\]\(https:\/\/artifact\/sbom\)/,
+  );
   assert.doesNotMatch(body, /Change since last run/);
   assert.doesNotMatch(body, /Previous runs/);
   assert.match(body, /<!-- gha-trivy-meta:.*"number":42/);
 });
 
-test('buildBody omits SBOM link when not provided', () => {
-  const body = buildBody({ ...baseOpts, links: { run: 'https://run/42', report: 'https://artifact/report' }, existingBody: undefined });
+test("buildBody omits SBOM link when not provided", () => {
+  const body = buildBody({
+    ...baseOpts,
+    links: { run: "https://run/42", report: "https://artifact/report" },
+    existingBody: undefined,
+  });
   assert.doesNotMatch(body, /\[SBOM\]/);
   assert.match(body, /\[HTML report\]/);
 });
 
-test('buildBody changed counts: prepends previous latest to history, shows delta', () => {
+test("buildBody changed counts: prepends previous latest to history, shows delta", () => {
   const prev = buildBody({
     ...baseOpts,
     counts: counts(3, 5, 10, 30, 4),
-    run: { number: 41, url: 'https://run/41' },
-    time: '2026-07-08T09:00:00Z',
+    run: { number: 41, url: "https://run/41" },
+    time: "2026-07-08T09:00:00Z",
     existingBody: undefined,
   });
   const body = buildBody({ ...baseOpts, existingBody: prev });
-  assert.match(body, /Change since last run: Critical 2 \(-1\) · High 5 \(=\) · Medium 12 \(\+2\)/);
+  assert.match(
+    body,
+    /Change since last run: Critical 2 \(-1\) · High 5 \(=\) · Medium 12 \(\+2\)/,
+  );
   assert.match(body, /<details><summary>Previous runs \(1\)<\/summary>/);
   assert.match(body, /#### run #41 · 2026-07-08T09:00:00Z/);
-  assert.match(body, /### Vulnerability summary \(myimage:tag\) — latest: run #42/);
+  assert.match(
+    body,
+    /### Vulnerability summary \(myimage:tag\) — latest: run #42/,
+  );
 });
 
 test('buildBody unchanged counts: no history growth, refreshed run, "no change"', () => {
   const prev = buildBody({
     ...baseOpts,
-    run: { number: 41, url: 'https://run/41' },
-    time: '2026-07-08T09:00:00Z',
+    run: { number: 41, url: "https://run/41" },
+    time: "2026-07-08T09:00:00Z",
     existingBody: undefined,
   });
   const body = buildBody({ ...baseOpts, existingBody: prev });
@@ -174,8 +211,11 @@ test('buildBody unchanged counts: no history growth, refreshed run, "no change"'
   assert.match(body, /latest: run #42/);
 });
 
-test('buildBody with malformed existing marker treats as first run', () => {
-  const body = buildBody({ ...baseOpts, existingBody: 'garbage <!-- gha-trivy-meta:{bad} -->' });
+test("buildBody with malformed existing marker treats as first run", () => {
+  const body = buildBody({
+    ...baseOpts,
+    existingBody: "garbage <!-- gha-trivy-meta:{bad} -->",
+  });
   assert.doesNotMatch(body, /Change since last run/);
   assert.doesNotMatch(body, /Previous runs/);
 });
@@ -191,18 +231,19 @@ Expected: FAIL — `Cannot find module './pr-comment.cjs'`.
 Create `scripts/pr-comment.cjs`:
 
 ```js
-'use strict';
+"use strict";
 
 const SEVERITIES = [
-  ['critical', 'Critical'],
-  ['high', 'High'],
-  ['medium', 'Medium'],
-  ['low', 'Low'],
-  ['unknown', 'Unknown'],
+  ["critical", "Critical"],
+  ["high", "High"],
+  ["medium", "Medium"],
+  ["low", "Low"],
+  ["unknown", "Unknown"],
 ];
 
 const META_RE = /<!-- gha-trivy-meta:(.*?) -->/;
-const HISTORY_RE = /<details><summary>Previous runs[^<]*<\/summary>\n\n([\s\S]*?)\n\n<\/details>/;
+const HISTORY_RE =
+  /<details><summary>Previous runs[^<]*<\/summary>\n\n([\s\S]*?)\n\n<\/details>/;
 
 function parseMeta(body) {
   if (!body) return null;
@@ -217,10 +258,10 @@ function parseMeta(body) {
 
 function renderTable(counts) {
   const c = counts || {};
-  const header = '| ' + SEVERITIES.map(([, label]) => label).join(' | ') + ' |';
-  const sep = '| ' + SEVERITIES.map(() => '---').join(' | ') + ' |';
-  const row = '| ' + SEVERITIES.map(([key]) => c[key] ?? 0).join(' | ') + ' |';
-  return [header, sep, row].join('\n');
+  const header = "| " + SEVERITIES.map(([, label]) => label).join(" | ") + " |";
+  const sep = "| " + SEVERITIES.map(() => "---").join(" | ") + " |";
+  const row = "| " + SEVERITIES.map(([key]) => c[key] ?? 0).join(" | ") + " |";
+  return [header, sep, row].join("\n");
 }
 
 function computeDeltaLine(current, previous) {
@@ -229,9 +270,9 @@ function computeDeltaLine(current, previous) {
     const cur = current[key] ?? 0;
     const prev = previous[key] ?? 0;
     const d = cur - prev;
-    const tag = d === 0 ? '=' : d > 0 ? `+${d}` : `${d}`;
+    const tag = d === 0 ? "=" : d > 0 ? `+${d}` : `${d}`;
     return `${label} ${cur} (${tag})`;
-  }).join(' · ');
+  }).join(" · ");
 }
 
 function countsEqual(a, b) {
@@ -240,9 +281,9 @@ function countsEqual(a, b) {
 }
 
 function extractHistoryInner(body) {
-  if (!body) return '';
+  if (!body) return "";
   const m = body.match(HISTORY_RE);
-  return m ? m[1] : '';
+  return m ? m[1] : "";
 }
 
 function historyEntry(meta) {
@@ -261,13 +302,13 @@ function buildBody({ slug, image, run, time, counts, links, existingBody }) {
   const historyCount = (historyInner.match(/#### run #/g) || []).length;
   const historySection = historyInner
     ? `<details><summary>Previous runs (${historyCount})</summary>\n\n${historyInner}\n\n</details>`
-    : '';
+    : "";
 
   let deltaLine = null;
   if (prev) {
     deltaLine = changed
       ? `Change since last run: ${computeDeltaLine(counts, prev.counts)}`
-      : 'Change since last run: no change';
+      : "Change since last run: no change";
   }
 
   const linkParts = [`[workflow run](${links.run})`];
@@ -280,19 +321,19 @@ function buildBody({ slug, image, run, time, counts, links, existingBody }) {
   const lines = [
     `<!-- gha-trivy:${slug} -->`,
     `### Vulnerability summary (${image}) — latest: run #${run.number}`,
-    '',
+    "",
     renderTable(counts),
-    '',
+    "",
   ];
   if (deltaLine) lines.push(deltaLine);
-  lines.push(`Links: ${linkParts.join(' · ')}`);
-  lines.push('');
+  lines.push(`Links: ${linkParts.join(" · ")}`);
+  lines.push("");
   lines.push(metaMarker);
   if (historySection) {
-    lines.push('');
+    lines.push("");
     lines.push(historySection);
   }
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 module.exports = {
@@ -322,9 +363,11 @@ git commit -m "feat: add pr-comment body builder module with tests"
 ### Task 2: Embed counts metadata marker in `summary.tpl`
 
 **Files:**
+
 - Modify: `summary.tpl`
 
 **Interfaces:**
+
 - Produces: `trivy.md` now ends with `<!-- gha-trivy-meta:{"counts":{"critical":N,"high":N,"medium":N,"low":N,"unknown":N}} -->`, consumed by `parseMeta` (Task 1) in the action step (Task 3).
 
 - [ ] **Step 1: Append the hidden marker to the template**
@@ -367,9 +410,11 @@ git commit -m "feat: embed severity counts marker in vulnerability summary"
 ### Task 3: Wire the composite action (`action.yml`)
 
 **Files:**
+
 - Modify: `action.yml` (add input; adjust two `if:` gates; add `id:` to two upload steps; add commenting step)
 
 **Interfaces:**
+
 - Consumes: `scripts/pr-comment.cjs` (Task 1) via `require`; `trivy.md` marker (Task 2).
 - Produces: PR comment behavior; no outputs consumed by later tasks.
 
@@ -378,9 +423,9 @@ git commit -m "feat: embed severity counts marker in vulnerability summary"
 In `action.yml`, after the `create-summary` input block (ends at line 41), add:
 
 ```yaml
-  create-pr-comment:
-    description: If a sticky PR comment with the vulnerability summary should be created/updated (only on pull_request events; requires pull-requests:write)
-    default: "true" # Note: Action inputs are always of type string
+create-pr-comment:
+  description: If a sticky PR comment with the vulnerability summary should be created/updated (only on pull_request events; requires pull-requests:write)
+  default: "true" # Note: Action inputs are always of type string
 ```
 
 - [ ] **Step 2: Gate `trivy.md` generation on either summary or PR comment**
@@ -388,13 +433,13 @@ In `action.yml`, after the `create-summary` input block (ends at line 41), add:
 Change the `if:` on the **"Copy vulnerability summary template"** step (currently line 269) and the **"Create summary on vulnerabilities"** step (currently line 274) from:
 
 ```yaml
-      if: ${{ inputs.create-summary == 'true' }}
+if: ${{ inputs.create-summary == 'true' }}
 ```
 
 to:
 
 ```yaml
-      if: ${{ inputs.create-summary == 'true' || inputs.create-pr-comment == 'true' }}
+if: ${{ inputs.create-summary == 'true' || inputs.create-pr-comment == 'true' }}
 ```
 
 Leave the **"Add to job summary"** step (line 293) gated on `inputs.create-summary == 'true'` unchanged.
@@ -404,18 +449,18 @@ Leave the **"Add to job summary"** step (line 293) gated on `inputs.create-summa
 On the **"Upload SBOM"** step (currently line 213, `uses: actions/upload-artifact...`) add an `id`:
 
 ```yaml
-    - name: Upload SBOM
-      id: upload-sbom
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+- name: Upload SBOM
+  id: upload-sbom
+  uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
 ```
 
 On the **"Upload vulnerability report"** step (currently line 260) add an `id`:
 
 ```yaml
-    - name: Upload vulnerability report
-      id: upload-report
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-      if: always()
+- name: Upload vulnerability report
+  id: upload-report
+  uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+  if: always()
 ```
 
 - [ ] **Step 4: Add the commenting step**
@@ -423,77 +468,77 @@ On the **"Upload vulnerability report"** step (currently line 260) add an `id`:
 Insert immediately after the **"Add to job summary"** step (after current line 297, before "Fix .trivy permissions"):
 
 ```yaml
-    - name: Post/update PR comment
-      if: ${{ always() && inputs.create-pr-comment == 'true' && github.event_name == 'pull_request' }}
-      uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-      env:
-        REPORT_URL: ${{ steps.upload-report.outputs.artifact-url }}
-        SBOM_URL: ${{ steps.upload-sbom.outputs.artifact-url }}
-        IMAGE_LABEL: ${{ inputs.image-ref != '' && inputs.image-ref || 'fs' }}
-        REPORT_SLUG: ${{ env.REPORT_SLUG }}
-      with:
-        script: |
-          const fs = require('fs');
-          const path = require('path');
-          const { parseMeta, buildBody } = require(path.join(process.env.GITHUB_ACTION_PATH, 'scripts', 'pr-comment.cjs'));
+- name: Post/update PR comment
+  if: ${{ always() && inputs.create-pr-comment == 'true' && github.event_name == 'pull_request' }}
+  uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+  env:
+    REPORT_URL: ${{ steps.upload-report.outputs.artifact-url }}
+    SBOM_URL: ${{ steps.upload-sbom.outputs.artifact-url }}
+    IMAGE_LABEL: ${{ inputs.image-ref != '' && inputs.image-ref || 'fs' }}
+    REPORT_SLUG: ${{ env.REPORT_SLUG }}
+  with:
+    script: |
+      const fs = require('fs');
+      const path = require('path');
+      const { parseMeta, buildBody } = require(path.join(process.env.GITHUB_ACTION_PATH, 'scripts', 'pr-comment.cjs'));
 
-          try {
-            if (!fs.existsSync('trivy.md')) {
-              core.warning('trivy.md not found; skipping PR comment.');
-              return;
-            }
-            const summary = fs.readFileSync('trivy.md', 'utf8');
-            const parsed = parseMeta(summary);
-            if (!parsed || !parsed.counts) {
-              core.warning('No counts marker found in trivy.md; skipping PR comment.');
-              return;
-            }
+      try {
+        if (!fs.existsSync('trivy.md')) {
+          core.warning('trivy.md not found; skipping PR comment.');
+          return;
+        }
+        const summary = fs.readFileSync('trivy.md', 'utf8');
+        const parsed = parseMeta(summary);
+        if (!parsed || !parsed.counts) {
+          core.warning('No counts marker found in trivy.md; skipping PR comment.');
+          return;
+        }
 
-            const slug = process.env.REPORT_SLUG;
-            const marker = `<!-- gha-trivy:${slug} -->`;
-            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-            const links = { run: runUrl };
-            if (process.env.REPORT_URL) links.report = process.env.REPORT_URL;
-            if (process.env.SBOM_URL) links.sbom = process.env.SBOM_URL;
+        const slug = process.env.REPORT_SLUG;
+        const marker = `<!-- gha-trivy:${slug} -->`;
+        const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+        const links = { run: runUrl };
+        if (process.env.REPORT_URL) links.report = process.env.REPORT_URL;
+        if (process.env.SBOM_URL) links.sbom = process.env.SBOM_URL;
 
-            const issueNumber = context.issue.number;
+        const issueNumber = context.issue.number;
 
-            const existing = await github.paginate(github.rest.issues.listComments, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issueNumber,
-              per_page: 100,
-            });
-            const mine = existing.find((c) => c.body && c.body.includes(marker));
+        const existing = await github.paginate(github.rest.issues.listComments, {
+          owner: context.repo.owner,
+          repo: context.repo.repo,
+          issue_number: issueNumber,
+          per_page: 100,
+        });
+        const mine = existing.find((c) => c.body && c.body.includes(marker));
 
-            const body = buildBody({
-              slug,
-              image: process.env.IMAGE_LABEL,
-              run: { number: context.runNumber, url: runUrl },
-              time: new Date().toISOString(),
-              counts: parsed.counts,
-              links,
-              existingBody: mine ? mine.body : undefined,
-            });
+        const body = buildBody({
+          slug,
+          image: process.env.IMAGE_LABEL,
+          run: { number: context.runNumber, url: runUrl },
+          time: new Date().toISOString(),
+          counts: parsed.counts,
+          links,
+          existingBody: mine ? mine.body : undefined,
+        });
 
-            if (mine) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: mine.id,
-                body,
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issueNumber,
-                body,
-              });
-            }
-          } catch (err) {
-            core.warning(`Could not post PR comment (grant 'pull-requests: write' if this is a permissions issue): ${err.message}`);
-          }
+        if (mine) {
+          await github.rest.issues.updateComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            comment_id: mine.id,
+            body,
+          });
+        } else {
+          await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: issueNumber,
+            body,
+          });
+        }
+      } catch (err) {
+        core.warning(`Could not post PR comment (grant 'pull-requests: write' if this is a permissions issue): ${err.message}`);
+      }
 ```
 
 - [ ] **Step 5: Validate action YAML parses**
@@ -518,9 +563,11 @@ git commit -m "feat: post sticky PR comment with vulnerability summary and links
 ### Task 4: CI — unit-test job and comment permissions (`.github/workflows/check.yml`)
 
 **Files:**
+
 - Modify: `.github/workflows/check.yml`
 
 **Interfaces:**
+
 - Consumes: `mise run test` (Task 1); the commenting step (Task 3) needs `pull-requests: write`.
 
 - [ ] **Step 1: Add a `unit-test` job and grant PR-comment permission to the integration job**
@@ -597,6 +644,7 @@ git commit -m "ci: run pr-comment unit tests and grant PR comment permission"
 ### Task 5: Documentation (`README.md`, `CHANGELOG.md`)
 
 **Files:**
+
 - Modify: `README.md`
 - Modify: `CHANGELOG.md`
 
@@ -606,7 +654,7 @@ git commit -m "ci: run pr-comment unit tests and grant PR comment permission"
 
 Replace the body of `README.md` with:
 
-```markdown
+````markdown
 # gha-trivy
 
 Composite action for Trivy vulnerability scanning:
@@ -632,10 +680,12 @@ permissions:
   contents: read
   pull-requests: write
 ```
+````
 
 If the token cannot write comments (permission not granted, or a pull request from a
 fork where the token is read-only), the action emits a warning and continues without
 failing. Set `create-pr-comment: "false"` to disable the comment entirely.
+
 ```
 
 - [ ] **Step 2: Add a `CHANGELOG.md` entry**
@@ -643,8 +693,10 @@ failing. Set `create-pr-comment: "false"` to disable the comment entirely.
 Open `CHANGELOG.md`, read the existing top-of-file format, and add a new entry at the top matching that style (heading level, date format, bullet style) with text:
 
 ```
+
 - feat: post a sticky PR comment with the vulnerability summary and links to the workflow run, HTML report, and SBOM; updated in place on re-runs with a change-only collapsed history (new input `create-pr-comment`, default `true`; requires `pull-requests: write`).
-```
+
+````
 
 If the changelog is auto-generated from Conventional Commits (release-please/semantic-release style), skip manual editing and note in the commit body that the entry comes from the `feat:` commits instead.
 
@@ -653,13 +705,14 @@ If the changelog is auto-generated from Conventional Commits (release-please/sem
 ```bash
 git add README.md CHANGELOG.md
 git commit -m "docs: document PR comment feature and required permission"
-```
+````
 
 ---
 
 ## Self-Review
 
 **Spec coverage:**
+
 - §1 new input & activation → Task 3 Step 1 (input), Step 4 (`if:` event+flag gate, `always()`).
 - §2 warn-and-continue → Task 3 Step 4 (`try/catch` + `core.warning`).
 - §3 counts marker / embedded state → Task 2 (template marker) + Task 3 Step 4 (parse + enrich into posted meta).
