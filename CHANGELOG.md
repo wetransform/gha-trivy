@@ -1,3 +1,17 @@
+## [2.7.0](https://github.com/wetransform/gha-trivy/compare/v2.6.0...v2.7.0) (2026-07-09)
+
+### Features
+
+* add grype-summary module for risk-based reporting ([f9a8f8e](https://github.com/wetransform/gha-trivy/commit/f9a8f8e1543719c1c2a3e586a9b06cd8a7241adb))
+* render grype risk section in the PR comment ([e04f393](https://github.com/wetransform/gha-trivy/commit/e04f3930c560a4d503aac12f556cf51a0b41ec4f))
+* scan SBOM with grype for risk-based reporting ([9c405da](https://github.com/wetransform/gha-trivy/commit/9c405da419288ee1fe89a203474d34e9a5b32023))
+
+### Bug Fixes
+
+* keep PR comment output unchanged when grype is absent ([d64eeb8](https://github.com/wetransform/gha-trivy/commit/d64eeb812520cdb20965dba5acb4719ca20cb75c))
+* make grype risk threshold non-gating, fall back to 40 on invalid input ([cf0ffa0](https://github.com/wetransform/gha-trivy/commit/cf0ffa02230d033da1df823450c5eb3973e99d03))
+* scan a Syft SBOM with grype so OS-package vulnerabilities are detected ([6499596](https://github.com/wetransform/gha-trivy/commit/649959616898ad14485f5358f7139f4dc5f61311))
+
 ## [2.6.0](https://github.com/wetransform/gha-trivy/compare/v2.5.2...v2.6.0) (2026-07-09)
 
 ### Features
