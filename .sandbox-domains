@@ -1,0 +1,6 @@
+# Project-specific sandbox domain allowlist
+# Passed as EXTRA_ALLOWED_DOMAINS when starting the container.
+# One domain per line. Leading dot = domain and all subdomains.
+# Lines starting with # are comments. Empty lines are ignored.
+# Added by code-sandbox-allow (2026-07-09)
+.oss.anchore.com
