@@ -172,8 +172,8 @@ function buildBody({
   if (grypeSection) {
     lines.push("");
     lines.push(grypeSection);
+    lines.push("");
   }
-  lines.push("");
   lines.push(`Links: ${linkParts.join(" · ")}`);
   lines.push("");
   lines.push(metaMarker);
