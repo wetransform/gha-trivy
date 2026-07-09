@@ -44,3 +44,38 @@ jobs:
           image-ref: test-gha-trivy:latest
           create-test-report: "true"
           create-summary: "true"
+
+  # Exercises the reporting behaviour (trivy summary + grype risk section)
+  # against an image that actually has vulnerabilities. It deliberately does
+  # NOT enable create-test-report, so the JUnit gate never runs and the job
+  # cannot fail on findings — grype is reporting-only anyway (fail-build: false).
+  check-vulnerable:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Create vulnerable Dockerfile
+        run: |
+          # Old EOL Alpine release: its packages (and curl's dependencies)
+          # carry known CVEs, so trivy and grype reliably report findings.
+          echo 'FROM alpine:3.10' > Dockerfile
+          echo 'RUN apk add --no-cache curl' >> Dockerfile
+
+      - name: Build vulnerable test image
+        run: |
+          docker build -t test-gha-trivy-vuln:latest .
+
+      - name: Run gha-trivy action (reporting only, must not fail)
+        uses: ./
+        with:
+          image-ref: test-gha-trivy-vuln:latest
+          # create-test-report is intentionally left at its default ("false"):
+          # no JUnit gate, so vulnerabilities are reported but never fail the job.
+          create-summary: "true"
+          # Low threshold so grype's "at/above risk threshold" count is
+          # exercised with a positive number on a vulnerable image.
+          grype-risk-threshold: "1"
