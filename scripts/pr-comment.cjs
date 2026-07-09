@@ -57,8 +57,23 @@ function historyEntry(meta) {
   return `#### run #${meta.run.number} · ${meta.time}\n\n${renderTable(meta.counts)}`;
 }
 
+// A previous marker is only usable if it carries everything buildBody needs to
+// render a delta and a history entry. A marker that parses as JSON but is
+// missing these fields (e.g. a hand-edited comment) is treated as marker drift:
+// no previous state, start fresh — never throw.
+function isUsablePrev(meta) {
+  return !!(
+    meta &&
+    meta.counts &&
+    meta.run &&
+    meta.run.number != null &&
+    meta.time
+  );
+}
+
 function buildBody({ slug, image, run, time, counts, links, existingBody }) {
-  const prev = parseMeta(existingBody);
+  const parsedPrev = parseMeta(existingBody);
+  const prev = isUsablePrev(parsedPrev) ? parsedPrev : null;
   const changed = !countsEqual(prev && prev.counts, counts);
 
   let historyInner = extractHistoryInner(existingBody);
