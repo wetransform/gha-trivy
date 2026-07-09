@@ -28,3 +28,4 @@
     <td align='center'>{{ $unknown }}</td>
   </tr>
 </table>
+<!-- gha-trivy-meta:{"counts":{"critical":{{ $critical }},"high":{{ $high }},"medium":{{ $medium }},"low":{{ $low }},"unknown":{{ $unknown }}}} -->
