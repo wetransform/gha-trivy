@@ -131,7 +131,8 @@ function main(argv, env) {
     );
     return 0;
   }
-  const threshold = Number(env.GRYPE_RISK_THRESHOLD);
+  const parsed = Number(env.GRYPE_RISK_THRESHOLD);
+  const threshold = Number.isFinite(parsed) ? parsed : 40;
   const result = analyze(doc, threshold);
   fs.writeFileSync("grype.md", renderSummary(result));
   fs.writeFileSync(
