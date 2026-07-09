@@ -1,3 +1,29 @@
+## [2.6.0](https://github.com/wetransform/gha-trivy/compare/v2.5.2...v2.6.0) (2026-07-09)
+
+### Features
+
+* add pr-comment body builder module with tests ([913f570](https://github.com/wetransform/gha-trivy/commit/913f57059b7a22fea77facb7395ffa42725cfc90))
+* embed severity counts marker in vulnerability summary ([5ccb9a2](https://github.com/wetransform/gha-trivy/commit/5ccb9a20c39fb31be6c604f40dbb50aa846d5349))
+* post sticky PR comment with vulnerability summary and links ([acb4c40](https://github.com/wetransform/gha-trivy/commit/acb4c406ee3e3271640fe5b6916dde1df45866e1))
+
+### Bug Fixes
+
+* **deps:** update actions/cache action to v5.0.5 ([c9b274b](https://github.com/wetransform/gha-trivy/commit/c9b274bdd6d390d034050adda601388078b88228))
+* **deps:** update actions/cache action to v6 ([a8b0730](https://github.com/wetransform/gha-trivy/commit/a8b073063b8caf8fcf39470b8e468314751b4015))
+* **deps:** update actions/checkout action to v7 ([908bd8d](https://github.com/wetransform/gha-trivy/commit/908bd8d5ca0e6fbc09c353fb26d6a0a273175f15))
+* **deps:** update all non-major dependencies ([481eb3f](https://github.com/wetransform/gha-trivy/commit/481eb3f3c28cbc1af08baf4f1673c9031366b4d7))
+* **deps:** update all non-major dependencies ([875345e](https://github.com/wetransform/gha-trivy/commit/875345e13eede5b56238d11b19074ce53a6cf5e7))
+* **deps:** update all non-major dependencies ([bdc9c8f](https://github.com/wetransform/gha-trivy/commit/bdc9c8f297d139300e7ab533851ffa36ce4284a2))
+* **deps:** update all non-major dependencies ([dc0da71](https://github.com/wetransform/gha-trivy/commit/dc0da71572395120bbf54fd4009f9c718b2d2d44))
+* **deps:** update all non-major dependencies to v6.0.3 ([6c0423c](https://github.com/wetransform/gha-trivy/commit/6c0423c85f6cc9b5c9748124ae514dc8ebbd98b1))
+* **deps:** update aquasecurity/trivy-action action to v0.35.0 ([9dbb2d6](https://github.com/wetransform/gha-trivy/commit/9dbb2d604087ab1fe27f53cb731bf94261739e18))
+* **deps:** update dependency cyclonedx/cyclonedx-cli to v0.31.0 ([53a6e5e](https://github.com/wetransform/gha-trivy/commit/53a6e5e4cb9e3521f480a9c9e96c10803e6842e4))
+* **deps:** update mikepenz/action-junit-report action to v6.4.1 ([153426d](https://github.com/wetransform/gha-trivy/commit/153426d66adbb46f124d6e2586403d28d60e0d2b))
+* **deps:** update node.js to v24.18.0 ([9ea84f6](https://github.com/wetransform/gha-trivy/commit/9ea84f6789c74bb7f97b4d683b3db8c2ce731f66))
+* **deps:** update trivy and trivy actions ([4d64483](https://github.com/wetransform/gha-trivy/commit/4d6448356ea0d0c34b3df83d42d7bc62d2e36dae))
+* restore checks:write permission and harden pr-comment step ([1e46f66](https://github.com/wetransform/gha-trivy/commit/1e46f66837f846e14254723dbb9820b4935cd5f6))
+* treat incomplete pr-comment meta marker as no previous state ([4bdad8e](https://github.com/wetransform/gha-trivy/commit/4bdad8ee8674fed8a911ef31c7be60ca3fc6045c))
+
 ## [2.5.2](https://github.com/wetransform/gha-trivy/compare/v2.5.1...v2.5.2) (2026-03-03)
 
 ### Bug Fixes
