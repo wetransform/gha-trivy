@@ -154,12 +154,41 @@ test("main writes grype.md/grype-meta.json/txt, and skips gracefully on bad inpu
     assert.ok(fs.existsSync(path.join(dir, "out-grype.txt")));
 
     // Bad input: no files written, returns 0 (resilient).
-    fs.rmSync(path.join(dir, "grype.md"));
-    const code2 = main(["node", "grype-summary.cjs", "does-not-exist.json"], {
-      GRYPE_RISK_THRESHOLD: "40",
-    });
-    assert.equal(code2, 0);
-    assert.equal(fs.existsSync(path.join(dir, "grype.md")), false);
+    // Use fresh temp dir to ensure nothing from first call is present.
+    const badDir = fs.mkdtempSync(path.join(os.tmpdir(), "grype-"));
+    const badCwd = process.cwd();
+    process.chdir(badDir);
+    try {
+      // Stub stderr to capture diagnostic without printing it.
+      const stderrWrites = [];
+      const origWrite = process.stderr.write;
+      process.stderr.write = function (chunk) {
+        stderrWrites.push(chunk);
+        return true;
+      };
+      try {
+        const code2 = main(
+          ["node", "grype-summary.cjs", "does-not-exist.json"],
+          {
+            GRYPE_RISK_THRESHOLD: "40",
+          },
+        );
+        assert.equal(code2, 0);
+        // Verify the diagnostic was emitted.
+        assert.ok(
+          stderrWrites.some((w) => /no usable grype JSON/.test(w)),
+          "Expected stderr diagnostic about missing grype JSON",
+        );
+      } finally {
+        process.stderr.write = origWrite;
+      }
+      // Verify no output files were created.
+      assert.equal(fs.existsSync(path.join(badDir, "grype.md")), false);
+      assert.equal(fs.existsSync(path.join(badDir, "grype-meta.json")), false);
+      assert.equal(fs.existsSync(path.join(badDir, "grype.txt")), false);
+    } finally {
+      process.chdir(badCwd);
+    }
   } finally {
     process.chdir(cwd);
   }
