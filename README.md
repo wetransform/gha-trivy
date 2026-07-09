@@ -24,6 +24,8 @@ permissions:
   pull-requests: write
 ```
 
+Workflows that also set `create-test-report: "true"` additionally need `checks: write` for the JUnit annotations.
+
 If the token cannot write comments (permission not granted, or a pull request from a
 fork where the token is read-only), the action emits a warning and continues without
 failing. Set `create-pr-comment: "false"` to disable the comment entirely.

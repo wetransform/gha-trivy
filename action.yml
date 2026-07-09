@@ -313,9 +313,9 @@ runs:
         script: |
           const fs = require('fs');
           const path = require('path');
-          const { parseMeta, buildBody } = require(path.join(process.env.GITHUB_ACTION_PATH, 'scripts', 'pr-comment.cjs'));
 
           try {
+            const { parseMeta, buildBody } = require(path.join(process.env.GITHUB_ACTION_PATH, 'scripts', 'pr-comment.cjs'));
             if (!fs.existsSync('trivy.md')) {
               core.warning('trivy.md not found; skipping PR comment.');
               return;
