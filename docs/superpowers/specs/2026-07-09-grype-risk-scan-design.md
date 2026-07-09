@@ -251,3 +251,22 @@ already tolerates missing fields.
 - **Vulnerability id form**: grype ids may be GHSA rather than CVE; the top-N
   column header is "Vulnerability" and shows grype's id verbatim (no `by-cve`
   normalization, to avoid dropping non-CVE advisories).
+
+## Addendum (post-implementation): grype scans a Syft SBOM, not Trivy's
+
+During verification, grype reported **zero** OS-package vulnerabilities when
+scanning Trivy's CycloneDX SBOM, while scanning the image directly found many.
+Root cause: Trivy encodes the OS distro (name/release) in a form grype cannot
+reliably read, so grype skips all OS (apk/deb/rpm) matching; only
+language/app-dependency matches (purl-only) survive. `anchore/scan-action`
+exposes no `--distro` override, so there is no config-only fix.
+
+Resolution (implemented): generate a **Syft** SBOM via
+[`anchore/sbom-action`](https://github.com/anchore/sbom-action) — from the image
+when `image-ref` is set, otherwise from the filesystem (`path: .`) — and have
+grype scan that Syft SBOM. Syft records the distro in grype's native format, so
+OS + language matching both work. Trivy's CycloneDX SBOM is unchanged and still
+drives Trivy's report/summary/artifact. When an SBOM is supplied via `scan-ref`,
+grype scans it as-is (OS detection then depends on that SBOM's origin). The Syft
+SBOM is uploaded alongside the grype report. Pins: `sbom-action` v0.24.0, Syft
+v1.46.0.
