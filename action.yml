@@ -39,6 +39,9 @@ inputs:
   create-summary:
     description: If a summary should be created
     default: "true"
+  create-pr-comment:
+    description: If a sticky PR comment with the vulnerability summary should be created/updated (only on pull_request events; requires pull-requests:write)
+    default: "true" # Note: Action inputs are always of type string
 runs:
   using: "composite"
   steps:
@@ -211,6 +214,7 @@ runs:
       run: |
         cyclonedx-cli convert --input-file ${{ env.REPORT_SLUG }}-sbom.json --output-file ${{ env.REPORT_SLUG }}-sbom.csv --output-format csv
     - name: Upload SBOM
+      id: upload-sbom
       if: "${{ inputs.scan-ref == '' || inputs.upload-scan-ref == 'true' }}"
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
@@ -258,6 +262,7 @@ runs:
         trivyignores: ${{ env.TRIVY_IGNORES_PATH }}
         skip-setup-trivy: true
     - name: Upload vulnerability report
+      id: upload-report
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       if: always()
       with:
@@ -266,12 +271,12 @@ runs:
         retention-days: ${{ inputs.report-retention-days }}
 
     - name: Copy vulnerability summary template
-      if: ${{ inputs.create-summary == 'true' }}
+      if: ${{ inputs.create-summary == 'true' || inputs.create-pr-comment == 'true' }}
       shell: bash
       run: |
         cp ${GITHUB_ACTION_PATH}/summary.tpl ./trivy-summary.tpl
     - name: Create summary on vulnerabilities
-      if: ${{ inputs.create-summary == 'true' }}
+      if: ${{ inputs.create-summary == 'true' || inputs.create-pr-comment == 'true' }}
       uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
       env:
         # workaround for trivy action not setting env variables if they use the default value
@@ -295,6 +300,78 @@ runs:
       run: |
         echo "### Vulnerability summary (${{ inputs.image-ref != '' && inputs.image-ref || 'fs' }})" >> $GITHUB_STEP_SUMMARY
         cat trivy.md >> $GITHUB_STEP_SUMMARY
+
+    - name: Post/update PR comment
+      if: ${{ always() && inputs.create-pr-comment == 'true' && github.event_name == 'pull_request' }}
+      uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+      env:
+        REPORT_URL: ${{ steps.upload-report.outputs.artifact-url }}
+        SBOM_URL: ${{ steps.upload-sbom.outputs.artifact-url }}
+        IMAGE_LABEL: ${{ inputs.image-ref != '' && inputs.image-ref || 'fs' }}
+        REPORT_SLUG: ${{ env.REPORT_SLUG }}
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          const { parseMeta, buildBody } = require(path.join(process.env.GITHUB_ACTION_PATH, 'scripts', 'pr-comment.cjs'));
+
+          try {
+            if (!fs.existsSync('trivy.md')) {
+              core.warning('trivy.md not found; skipping PR comment.');
+              return;
+            }
+            const summary = fs.readFileSync('trivy.md', 'utf8');
+            const parsed = parseMeta(summary);
+            if (!parsed || !parsed.counts) {
+              core.warning('No counts marker found in trivy.md; skipping PR comment.');
+              return;
+            }
+
+            const slug = process.env.REPORT_SLUG;
+            const marker = `<!-- gha-trivy:${slug} -->`;
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const links = { run: runUrl };
+            if (process.env.REPORT_URL) links.report = process.env.REPORT_URL;
+            if (process.env.SBOM_URL) links.sbom = process.env.SBOM_URL;
+
+            const issueNumber = context.issue.number;
+
+            const existing = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              per_page: 100,
+            });
+            const mine = existing.find((c) => c.body && c.body.includes(marker));
+
+            const body = buildBody({
+              slug,
+              image: process.env.IMAGE_LABEL,
+              run: { number: context.runNumber, url: runUrl },
+              time: new Date().toISOString(),
+              counts: parsed.counts,
+              links,
+              existingBody: mine ? mine.body : undefined,
+            });
+
+            if (mine) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: mine.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body,
+              });
+            }
+          } catch (err) {
+            core.warning(`Could not post PR comment (grant 'pull-requests: write' if this is a permissions issue): ${err.message}`);
+          }
 
       # Save trivy cache
     - name: Fix .trivy permissions
