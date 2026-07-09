@@ -140,3 +140,13 @@ test("buildBody with malformed existing marker treats as first run", () => {
   assert.doesNotMatch(body, /Change since last run/);
   assert.doesNotMatch(body, /Previous runs/);
 });
+
+test("buildBody with valid-JSON but incomplete meta (no run/time) treats as first run", () => {
+  // A tampered/edited comment whose marker parses as JSON but lacks run/time.
+  // With changed counts this must not throw; it starts fresh (marker-drift).
+  const existingBody = 'x <!-- gha-trivy-meta:{"counts":{"critical":9}} --> y';
+  const body = buildBody({ ...baseOpts, existingBody });
+  assert.doesNotMatch(body, /Change since last run/);
+  assert.doesNotMatch(body, /Previous runs/);
+  assert.match(body, /latest: run #42/);
+});
