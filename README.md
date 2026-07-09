@@ -6,8 +6,8 @@ Composite action for Trivy vulnerability scanning:
 - create a HTML report on vulnerabilities and add it as artifact to the run
 - add information to the run summary on types of vulnerabilities
 - on pull requests, post a sticky PR comment with the vulnerability summary and links to the run and artifacts
-- additionally scan the SBOM with [grype](https://github.com/anchore/grype) and
-  report risk-based results (reporting only — grype never fails the build)
+- additionally scan with [grype](https://github.com/anchore/grype) and report
+  risk-based results (reporting only — grype never fails the build)
 
 ## PR comment
 
@@ -34,7 +34,7 @@ failing. Set `create-pr-comment: "false"` to disable the comment entirely.
 
 ## Grype risk scan
 
-In addition to the trivy scan, the action scans the same SBOM with
+In addition to the trivy scan, the action scans with
 [grype](https://github.com/anchore/grype) for risk-based reporting. Grype's RISK
 score (0–100, combining CVSS impact, EPSS exploit probability, and KEV / known
 exploitation) is used to extend the summary and PR comment with:
@@ -45,6 +45,16 @@ exploitation) is used to extend the summary and PR comment with:
 Grype is **reporting only** — it never fails the build. Trivy's `fail-for`
 remains the sole gate. The full grype JSON and a plain-text findings table are
 uploaded as an artifact.
+
+Grype does not scan Trivy's CycloneDX SBOM directly: Trivy encodes the OS distro
+in a way grype cannot reliably read, so grype would miss all OS-package
+vulnerabilities. Instead the action generates a
+[Syft](https://github.com/anchore/syft) SBOM (via
+[sbom-action](https://github.com/anchore/sbom-action), covering both images and
+the filesystem) and grype scans that, restoring full OS + language matching. The
+Syft SBOM is uploaded alongside the grype report. When an SBOM is supplied
+directly via `scan-ref`, grype scans that SBOM as-is (OS-package detection then
+depends on the SBOM's origin).
 
 The risk threshold defaults to `40` and is resolved in this order:
 

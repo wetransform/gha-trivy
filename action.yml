@@ -330,13 +330,44 @@ runs:
     # Grype risk-based scan (reporting only; never fails the build)
     #
 
+    # Grype cannot reliably determine the OS distro from Trivy's CycloneDX SBOM,
+    # so scanning that SBOM misses all OS-package vulnerabilities. A Syft SBOM
+    # carries the distro in grype's native format, restoring OS + language
+    # matching. Syft handles both images and the filesystem. Only generated when
+    # we create the SBOM ourselves (no external scan-ref is supplied).
+    - name: Generate Syft SBOM from image (for grype)
+      if: "${{ inputs.grype-enabled == 'true' && inputs.scan-ref == '' && inputs.image-ref != '' }}"
+      continue-on-error: true
+      uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
+      with:
+        image: "${{ inputs.image-ref }}"
+        # renovate: datasource=github-releases depName=anchore/syft
+        syft-version: v1.46.0
+        format: syft-json
+        output-file: "${{ env.REPORT_SLUG }}-syft.json"
+        upload-artifact: false
+
+    - name: Generate Syft SBOM from filesystem (for grype)
+      if: "${{ inputs.grype-enabled == 'true' && inputs.scan-ref == '' && inputs.image-ref == '' }}"
+      continue-on-error: true
+      uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
+      with:
+        path: "."
+        # renovate: datasource=github-releases depName=anchore/syft
+        syft-version: v1.46.0
+        format: syft-json
+        output-file: "${{ env.REPORT_SLUG }}-syft.json"
+        upload-artifact: false
+
     - name: Scan SBOM with grype
       id: grype-scan
       if: "${{ inputs.grype-enabled == 'true' }}"
       continue-on-error: true
       uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2 # v7.4.0
       with:
-        sbom: "${{ env.REPORT_SLUG }}-sbom.json"
+        # Use the Syft SBOM we just generated; fall back to an externally
+        # supplied SBOM (scan-ref) when one was provided.
+        sbom: "${{ inputs.scan-ref != '' && format('{0}-sbom.json', env.REPORT_SLUG) || format('{0}-syft.json', env.REPORT_SLUG) }}"
         # renovate: datasource=github-releases depName=anchore/grype
         grype-version: v0.115.0
         output-format: json
@@ -363,6 +394,7 @@ runs:
         path: |
           ${{ env.REPORT_SLUG }}-grype.json
           ${{ env.REPORT_SLUG }}-grype.txt
+          ${{ env.REPORT_SLUG }}-syft.json
         retention-days: ${{ inputs.report-retention-days }}
 
     - name: Add grype summary to job summary
