@@ -180,6 +180,18 @@ test("buildBody without grype is unchanged (no grype section or marker)", () => 
   assert.doesNotMatch(body, /"grype"/);
 });
 
+test("buildBody no-grype output has no extra blank line before Links (backward compat)", () => {
+  const body = buildBody({ ...baseOpts, existingBody: undefined });
+  assert.ok(
+    body.includes("\n\nLinks:"),
+    "expected exactly one blank line before Links",
+  );
+  assert.ok(
+    !body.includes("\n\n\nLinks:"),
+    "must not insert an extra blank line before Links when grype is absent",
+  );
+});
+
 test("buildBody renders grype section with warning headline and top table", () => {
   const body = buildBody({
     ...baseOpts,
