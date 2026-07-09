@@ -109,6 +109,7 @@ runs:
     # Determine effective grype risk threshold (input, else file, else default 40)
     - name: Determine grype risk threshold
       if: "${{ inputs.grype-enabled == 'true' }}"
+      continue-on-error: true
       shell: bash
       run: |
         if [ "${{ inputs.grype-risk-threshold }}" != "" ]; then
@@ -119,8 +120,8 @@ runs:
           THRESHOLD=40
         fi
         if ! echo "$THRESHOLD" | grep -Eq '^[0-9]+(\.[0-9]+)?$'; then
-          echo "::error::Invalid grype risk threshold: '$THRESHOLD' (expected a number 0-100)" >&2
-          exit 1
+          echo "::warning::Invalid grype risk threshold: '$THRESHOLD' (expected a number 0-100); falling back to 40" >&2
+          THRESHOLD=40
         fi
         echo "GRYPE_RISK_THRESHOLD=$THRESHOLD" >> $GITHUB_ENV
 

@@ -52,4 +52,7 @@ The risk threshold defaults to `40` and is resolved in this order:
 2. the content of a `.grype-risk-threshold` file at the repository root;
 3. the default `40`.
 
+An invalid or non-numeric threshold value emits a warning and falls back to
+`40` (grype never fails the build).
+
 Set `grype-enabled: "false"` to disable the grype scan entirely.

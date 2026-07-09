@@ -193,3 +193,23 @@ test("main writes grype.md/grype-meta.json/txt, and skips gracefully on bad inpu
     process.chdir(cwd);
   }
 });
+
+test("main falls back to threshold 40 when GRYPE_RISK_THRESHOLD is absent", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "grype-"));
+  const cwd = process.cwd();
+  process.chdir(dir);
+  try {
+    const jsonPath = path.join(dir, "in-grype.json");
+    fs.writeFileSync(jsonPath, JSON.stringify(doc));
+
+    const code = main(["node", "grype-summary.cjs", jsonPath, "out.txt"], {});
+    assert.equal(code, 0);
+    const meta = JSON.parse(
+      fs.readFileSync(path.join(dir, "grype-meta.json"), "utf8"),
+    );
+    assert.equal(meta.threshold, 40);
+    assert.equal(typeof meta.threshold, "number");
+  } finally {
+    process.chdir(cwd);
+  }
+});
