@@ -132,7 +132,7 @@ Update rules:
 - **Counts unchanged:** leave the history section untouched; refresh only the latest
   run link and timestamp; delta line reads `Change since last run: no change`.
 
-Delta line format: per severity, `<Name> <count> (<±delta or =>)`, joined by ` · `.
+Delta line format: per severity, `<Name> <count> (<±delta or =>)`, joined by `·`.
 
 History grows only when counts change; it is not capped.
 
@@ -179,4 +179,7 @@ History grows only when counts change; it is not capped.
 - **Marker drift**: if the marker is missing/malformed (e.g. a user edited the
   comment), treat as "no previous state" — post a fresh latest block and start history
   anew rather than erroring.
+
+```
+
 ```
