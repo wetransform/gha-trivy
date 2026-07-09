@@ -1,5 +1,7 @@
 "use strict";
 
+const grypeSummary = require("./grype-summary.cjs");
+
 const SEVERITIES = [
   ["critical", "Critical"],
   ["high", "High"],
@@ -54,7 +56,42 @@ function extractHistoryInner(body) {
 }
 
 function historyEntry(meta) {
-  return `#### run #${meta.run.number} · ${meta.time}\n\n${renderTable(meta.counts)}`;
+  const parts = [
+    `#### run #${meta.run.number} · ${meta.time}`,
+    "",
+    renderTable(meta.counts),
+  ];
+  if (meta.grype) {
+    parts.push("", `Risk≥${meta.grype.threshold}: ${meta.grype.atOrAbove}`);
+  }
+  return parts.join("\n");
+}
+
+function grypeDeltaLine(cur, prev) {
+  const c = cur.atOrAbove ?? 0;
+  const p = prev.atOrAbove ?? 0;
+  const d = c - p;
+  const tag = d === 0 ? "=" : d > 0 ? `+${d}` : `${d}`;
+  return `Risk≥${cur.threshold}: ${c} (${tag})`;
+}
+
+function renderGrypeSection(grype) {
+  if (!grype) return null;
+  const headline =
+    (grype.atOrAbove ?? 0) > 0
+      ? `⚠️ ${grype.atOrAbove} at/above risk threshold ${grype.threshold}`
+      : `✅ 0 at/above risk threshold ${grype.threshold}`;
+  return [
+    "**Grype (risk-based)**",
+    "",
+    headline,
+    "",
+    grypeSummary.renderSeverityTable(grype.severities || {}),
+    "",
+    "**Top by risk**",
+    "",
+    grypeSummary.renderTopTable(grype.top || []),
+  ].join("\n");
 }
 
 // A previous marker is only usable if it carries everything buildBody needs to
@@ -71,10 +108,24 @@ function isUsablePrev(meta) {
   );
 }
 
-function buildBody({ slug, image, run, time, counts, links, existingBody }) {
+function buildBody({
+  slug,
+  image,
+  run,
+  time,
+  counts,
+  links,
+  existingBody,
+  grype,
+}) {
   const parsedPrev = parseMeta(existingBody);
   const prev = isUsablePrev(parsedPrev) ? parsedPrev : null;
-  const changed = !countsEqual(prev && prev.counts, counts);
+
+  const severitiesChanged = !countsEqual(prev && prev.counts, counts);
+  const grypeChanged =
+    !!(grype && prev && prev.grype) &&
+    (prev.grype.atOrAbove ?? 0) !== (grype.atOrAbove ?? 0);
+  const changed = severitiesChanged || grypeChanged;
 
   let historyInner = extractHistoryInner(existingBody);
   if (prev && changed) {
@@ -88,16 +139,24 @@ function buildBody({ slug, image, run, time, counts, links, existingBody }) {
 
   let deltaLine = null;
   if (prev) {
-    deltaLine = changed
+    deltaLine = severitiesChanged
       ? `Change since last run: ${computeDeltaLine(counts, prev.counts)}`
       : "Change since last run: no change";
+  }
+  let grypeDeltaStr = null;
+  if (prev && prev.grype && grype) {
+    grypeDeltaStr = grypeDeltaLine(grype, prev.grype);
   }
 
   const linkParts = [`[workflow run](${links.run})`];
   if (links.report) linkParts.push(`[HTML report](${links.report})`);
   if (links.sbom) linkParts.push(`[SBOM](${links.sbom})`);
+  if (links.grype) linkParts.push(`[Grype report](${links.grype})`);
 
   const meta = { counts, run, time, image };
+  if (grype) {
+    meta.grype = { threshold: grype.threshold, atOrAbove: grype.atOrAbove };
+  }
   const metaMarker = `<!-- gha-trivy-meta:${JSON.stringify(meta)} -->`;
 
   const lines = [
@@ -108,6 +167,13 @@ function buildBody({ slug, image, run, time, counts, links, existingBody }) {
     "",
   ];
   if (deltaLine) lines.push(deltaLine);
+  if (grypeDeltaStr) lines.push(grypeDeltaStr);
+  const grypeSection = renderGrypeSection(grype);
+  if (grypeSection) {
+    lines.push("");
+    lines.push(grypeSection);
+  }
+  lines.push("");
   lines.push(`Links: ${linkParts.join(" · ")}`);
   lines.push("");
   lines.push(metaMarker);

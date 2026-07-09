@@ -150,3 +150,89 @@ test("buildBody with valid-JSON but incomplete meta (no run/time) treats as firs
   assert.doesNotMatch(body, /Previous runs/);
   assert.match(body, /latest: run #42/);
 });
+
+const grypeMeta = (atOrAbove, threshold = 40) => ({
+  threshold,
+  atOrAbove,
+  severities: {
+    critical: 1,
+    high: 2,
+    medium: 0,
+    low: 0,
+    negligible: 0,
+    unknown: 0,
+  },
+  top: [
+    {
+      id: "CVE-1",
+      pkg: "libx 1.0",
+      severity: "Critical",
+      risk: 92.0,
+      epss: 0.87,
+      kev: true,
+    },
+  ],
+});
+
+test("buildBody without grype is unchanged (no grype section or marker)", () => {
+  const body = buildBody({ ...baseOpts, existingBody: undefined });
+  assert.doesNotMatch(body, /Grype \(risk-based\)/);
+  assert.doesNotMatch(body, /"grype"/);
+});
+
+test("buildBody renders grype section with warning headline and top table", () => {
+  const body = buildBody({
+    ...baseOpts,
+    grype: grypeMeta(3),
+    existingBody: undefined,
+  });
+  assert.match(body, /\*\*Grype \(risk-based\)\*\*/);
+  assert.match(body, /⚠️ 3 at\/above risk threshold 40/);
+  assert.match(
+    body,
+    /\| Vulnerability \| Package \| Sev \| Risk \| EPSS \| KEV \|/,
+  );
+  assert.match(
+    body,
+    /<!-- gha-trivy-meta:.*"grype":\{"threshold":40,"atOrAbove":3\}/,
+  );
+});
+
+test("buildBody grype section shows check headline at zero", () => {
+  const body = buildBody({
+    ...baseOpts,
+    grype: grypeMeta(0),
+    existingBody: undefined,
+  });
+  assert.match(body, /✅ 0 at\/above risk threshold 40/);
+});
+
+test("buildBody tracks grype risk-count delta and records history on grype-only change", () => {
+  const prev = buildBody({
+    ...baseOpts,
+    grype: grypeMeta(2),
+    run: { number: 41, url: "https://run/41" },
+    time: "2026-07-08T09:00:00Z",
+    existingBody: undefined,
+  });
+  const body = buildBody({
+    ...baseOpts,
+    grype: grypeMeta(3),
+    existingBody: prev,
+  });
+  // Severity counts identical across runs, but grype count changed → delta + history.
+  assert.match(body, /Change since last run: no change/);
+  assert.match(body, /Risk≥40: 3 \(\+1\)/);
+  assert.match(body, /<details><summary>Previous runs \(1\)<\/summary>/);
+  assert.match(body, /Risk≥40: 2/); // previous count recorded in history entry
+});
+
+test("buildBody adds grype report link when provided", () => {
+  const body = buildBody({
+    ...baseOpts,
+    grype: grypeMeta(1),
+    links: { ...baseOpts.links, grype: "https://artifact/grype" },
+    existingBody: undefined,
+  });
+  assert.match(body, /\[Grype report\]\(https:\/\/artifact\/grype\)/);
+});
