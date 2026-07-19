@@ -342,7 +342,7 @@ runs:
       with:
         image: "${{ inputs.image-ref }}"
         # renovate: datasource=github-releases depName=anchore/syft
-        syft-version: v1.46.0
+        syft-version: v1.48.0
         format: syft-json
         output-file: "${{ env.REPORT_SLUG }}-syft.json"
         upload-artifact: false
@@ -354,7 +354,7 @@ runs:
       with:
         path: "."
         # renovate: datasource=github-releases depName=anchore/syft
-        syft-version: v1.46.0
+        syft-version: v1.48.0
         format: syft-json
         output-file: "${{ env.REPORT_SLUG }}-syft.json"
         upload-artifact: false
@@ -369,7 +369,7 @@ runs:
         # supplied SBOM (scan-ref) when one was provided.
         sbom: "${{ inputs.scan-ref != '' && format('{0}-sbom.json', env.REPORT_SLUG) || format('{0}-syft.json', env.REPORT_SLUG) }}"
         # renovate: datasource=github-releases depName=anchore/grype
-        grype-version: v0.115.0
+        grype-version: v0.116.0
         output-format: json
         output-file: "${{ env.REPORT_SLUG }}-grype.json"
         fail-build: false
