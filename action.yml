@@ -142,7 +142,7 @@ runs:
       uses: jaxxstorm/action-install-gh-release@cd6b2b78ad38bdd294341cda064ec0692b06215b # v1.14.0
       with:
         repo: CycloneDX/cyclonedx-cli
-        tag: v0.32.0 # optional, otherwise use latest
+        tag: v0.33.1 # optional, otherwise use latest
 
         # extension-matching: disable # disable extension matching because artifacts are binaries
 
@@ -342,7 +342,7 @@ runs:
       with:
         image: "${{ inputs.image-ref }}"
         # renovate: datasource=github-releases depName=anchore/syft
-        syft-version: v1.46.0
+        syft-version: v1.50.0
         format: syft-json
         output-file: "${{ env.REPORT_SLUG }}-syft.json"
         upload-artifact: false
@@ -354,7 +354,7 @@ runs:
       with:
         path: "."
         # renovate: datasource=github-releases depName=anchore/syft
-        syft-version: v1.46.0
+        syft-version: v1.50.0
         format: syft-json
         output-file: "${{ env.REPORT_SLUG }}-syft.json"
         upload-artifact: false
@@ -369,7 +369,7 @@ runs:
         # supplied SBOM (scan-ref) when one was provided.
         sbom: "${{ inputs.scan-ref != '' && format('{0}-sbom.json', env.REPORT_SLUG) || format('{0}-syft.json', env.REPORT_SLUG) }}"
         # renovate: datasource=github-releases depName=anchore/grype
-        grype-version: v0.115.0
+        grype-version: v0.116.1
         output-format: json
         output-file: "${{ env.REPORT_SLUG }}-grype.json"
         fail-build: false
