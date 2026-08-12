@@ -1,3 +1,24 @@
+## [3.0.0](https://github.com/wetransform/gha-trivy/compare/v2.7.0...v3.0.0) (2026-08-12)
+
+### ⚠ BREAKING CHANGES
+
+* without the fail-for input or a .trivy-fail-for file,
+the action only reports and never fails the workflow. Set fail-for:
+CRITICAL (or add a .trivy-fail-for file) to restore the previous
+gating behavior.
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+
+### Features
+
+* report-only by default, fail only when fail-for is configured ([36d7bc7](https://github.com/wetransform/gha-trivy/commit/36d7bc797e03dfc46c3545815e0d833920942a35))
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([fb581a1](https://github.com/wetransform/gha-trivy/commit/fb581a1b3dcf96b415e2e85eff67edee965b8bb6))
+* **deps:** update all non-major dependencies ([af98194](https://github.com/wetransform/gha-trivy/commit/af981949bd897b7dfb064427a82d1eae6c751bcc))
+* image-user check condition treated string 'false' as truthy ([d2c8edf](https://github.com/wetransform/gha-trivy/commit/d2c8edf31218ab0e80546b947674f2b1b4237b91))
+
 ## [2.7.0](https://github.com/wetransform/gha-trivy/compare/v2.6.0...v2.7.0) (2026-07-09)
 
 ### Features
