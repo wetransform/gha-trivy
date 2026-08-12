@@ -2,12 +2,32 @@
 
 Composite action for Trivy vulnerability scanning:
 
-- add specific (default: CRITICAL) vulnerabilities to a JUnit test report
+- optionally fail the workflow for configured vulnerability severities via a
+  JUnit test report (report-only by default)
 - create a HTML report on vulnerabilities and add it as artifact to the run
 - add information to the run summary on types of vulnerabilities
 - on pull requests, post a sticky PR comment with the vulnerability summary and links to the run and artifacts
 - additionally scan with [grype](https://github.com/anchore/grype) and report
   risk-based results (reporting only — grype never fails the build)
+
+## Failing the workflow
+
+By default the action is **report-only**: it creates reports, summaries, and
+PR comments, but never fails the workflow. To fail the workflow when
+vulnerabilities of certain severities are present, configure the severities
+to fail for. They are resolved in this order:
+
+1. the `fail-for` input, if set (a comma-separated list, e.g. `CRITICAL,HIGH`);
+2. the content of a `.trivy-fail-for` file at the repository root, which holds
+   a single lowest severity (e.g. `HIGH` means fail for `CRITICAL,HIGH`);
+3. otherwise the action is report-only and does not fail the workflow.
+
+Failing works via the JUnit test report, so it additionally requires
+`junit-test-output` to be set or `create-test-report: "true"`.
+
+In report-only mode with `junit-test-output` set, a placeholder JUnit file
+containing a single passing test is written to that path, so workflow steps
+that consume the file keep working.
 
 ## PR comment
 
