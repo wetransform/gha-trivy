@@ -22,8 +22,10 @@ to fail for. They are resolved in this order:
    a single lowest severity (e.g. `HIGH` means fail for `CRITICAL,HIGH`);
 3. otherwise the action is report-only and does not fail the workflow.
 
-Failing works via the JUnit test report, so it additionally requires
-`junit-test-output` to be set or `create-test-report: "true"`.
+Failing works via the JUnit test report: with `create-test-report: "true"`
+the action publishes the report and fails the workflow itself. With only
+`junit-test-output` set, the action writes the gate JUnit file and failing
+is up to the workflow step that consumes it.
 
 In report-only mode with `junit-test-output` set, a placeholder JUnit file
 containing a single passing test is written to that path, so workflow steps

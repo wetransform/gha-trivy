@@ -268,6 +268,9 @@ runs:
         trivyignores: ${{ env.TRIVY_IGNORES_PATH }}
         skip-setup-trivy: true
 
+    # In report-only mode, still provide a JUnit file for callers that consume
+    # it outside the action. A single passing test is used instead of an empty
+    # suite because some JUnit consumers treat "no tests found" as an error.
     - name: Create placeholder JUnit report (report-only mode)
       if: "${{ env.FAIL_FOR_EFFECTIVE == '' && inputs.junit-test-output != '' }}"
       shell: bash
