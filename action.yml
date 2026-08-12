@@ -25,7 +25,7 @@ inputs:
     required: false
     default: "false" # Note: Action inputs are always of type string
   fail-for:
-    description: Issue types for fail for if they are present (added to JUnit report)
+    description: Severities to fail the workflow for if present (added to JUnit report). Falls back to a .trivy-fail-for file; if neither is set the action only reports and never fails
     default: "" # e.g. CRITICAL,HIGH
   report-retention-days:
     description: Number of days to retain the HTML report
