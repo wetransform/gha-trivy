@@ -354,11 +354,11 @@ runs:
     - name: Generate Syft SBOM from image (for grype)
       if: "${{ inputs.grype-enabled == 'true' && inputs.scan-ref == '' && inputs.image-ref != '' }}"
       continue-on-error: true
-      uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26 # v0.24.2
+      uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
       with:
         image: "${{ inputs.image-ref }}"
         # renovate: datasource=github-releases depName=anchore/syft
-        syft-version: v1.52.0
+        syft-version: v1.54.0
         format: syft-json
         output-file: "${{ env.REPORT_SLUG }}-syft.json"
         upload-artifact: false
@@ -366,11 +366,11 @@ runs:
     - name: Generate Syft SBOM from filesystem (for grype)
       if: "${{ inputs.grype-enabled == 'true' && inputs.scan-ref == '' && inputs.image-ref == '' }}"
       continue-on-error: true
-      uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26 # v0.24.2
+      uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
       with:
         path: "."
         # renovate: datasource=github-releases depName=anchore/syft
-        syft-version: v1.52.0
+        syft-version: v1.54.0
         format: syft-json
         output-file: "${{ env.REPORT_SLUG }}-syft.json"
         upload-artifact: false
@@ -385,7 +385,7 @@ runs:
         # supplied SBOM (scan-ref) when one was provided.
         sbom: "${{ inputs.scan-ref != '' && format('{0}-sbom.json', env.REPORT_SLUG) || format('{0}-syft.json', env.REPORT_SLUG) }}"
         # renovate: datasource=github-releases depName=anchore/grype
-        grype-version: v0.119.0
+        grype-version: v0.120.0
         output-format: json
         output-file: "${{ env.REPORT_SLUG }}-grype.json"
         fail-build: false
