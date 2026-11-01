@@ -358,7 +358,7 @@ runs:
       with:
         image: "${{ inputs.image-ref }}"
         # renovate: datasource=github-releases depName=anchore/syft
-        syft-version: v1.54.1
+        syft-version: v1.55.0
         format: syft-json
         output-file: "${{ env.REPORT_SLUG }}-syft.json"
         upload-artifact: false
@@ -370,7 +370,7 @@ runs:
       with:
         path: "."
         # renovate: datasource=github-releases depName=anchore/syft
-        syft-version: v1.54.1
+        syft-version: v1.55.0
         format: syft-json
         output-file: "${{ env.REPORT_SLUG }}-syft.json"
         upload-artifact: false
@@ -385,7 +385,7 @@ runs:
         # supplied SBOM (scan-ref) when one was provided.
         sbom: "${{ inputs.scan-ref != '' && format('{0}-sbom.json', env.REPORT_SLUG) || format('{0}-syft.json', env.REPORT_SLUG) }}"
         # renovate: datasource=github-releases depName=anchore/grype
-        grype-version: v0.120.1
+        grype-version: v0.121.0
         output-format: json
         output-file: "${{ env.REPORT_SLUG }}-grype.json"
         fail-build: false
@@ -525,7 +525,7 @@ runs:
 
     # https://github.com/marketplace/actions/junit-report-action
     - name: Publish Test Report
-      uses: mikepenz/action-junit-report@6ef3fdcfcd5f0b5d14df3e659ef19b8c6820f93d # v6.6.1
+      uses: mikepenz/action-junit-report@8a133bfa3ecb0ea9024c1e2ae788b4c25f6cdb9d # v6.6.2
       if: ${{ always() && env.FAIL_FOR_EFFECTIVE != '' && inputs.create-test-report == 'true' }} # always run even if the previous step fails
       with:
         report_paths: "${{ inputs.junit-test-output != '' && inputs.junit-test-output || 'trivy.xml' }}*"
