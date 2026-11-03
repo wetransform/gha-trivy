@@ -204,13 +204,22 @@ runs:
         cp "$SRC_DIR/junit.tpl" ./trivy-junit.tpl
         cp "$SRC_DIR/html.tpl" ./trivy-html.tpl
 
+      # The cache holds the Trivy databases (~1 GB), which are refreshed upstream several times a day.
+      # Key it by day, so that at most one cache per day and branch scope is saved, instead of one per run
+      # (per-run caches are never reused and quickly exhaust the repository's cache quota, evicting other caches).
+    - name: Determine trivy cache key
+      id: cache-trivy-key
+      shell: bash
+      run: |
+        echo "date=$(date -u +%Y-%m-%d)" >> $GITHUB_OUTPUT
     - name: Restore trivy cache
       id: cache-trivy-restore
       uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: .trivy
-        key: ${{ runner.os }}-trivy-${{ github.job }}-${{ github.run_id }}
+        key: ${{ runner.os }}-trivy-db-${{ steps.cache-trivy-key.outputs.date }}
         restore-keys: |
+          ${{ runner.os }}-trivy-db-
           ${{ runner.os }}-trivy-
 
       # https://github.com/aquasecurity/trivy-action
@@ -511,8 +520,9 @@ runs:
       shell: bash
       run: sudo chown -R $(stat . -c %u:%g) .trivy
     - name: Save trivy cache
-      continue-on-error: true # ignore error (e.g. if cached was already saved in same workflow run)
-      if: always() # always save
+      continue-on-error: true # ignore error (e.g. if cache was already saved by a parallel job)
+      # always save, unless today's cache was already restored
+      if: always() && steps.cache-trivy-restore.outputs.cache-hit != 'true'
       id: cache-trivy-save
       uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
