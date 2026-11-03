@@ -1,3 +1,18 @@
+## [3.0.1](https://github.com/wetransform/gha-trivy/compare/v3.0.0...v3.0.1) (2026-11-03)
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([272f53d](https://github.com/wetransform/gha-trivy/commit/272f53d34acbb710a5151994893057063a59283a))
+* **deps:** update all non-major dependencies ([013edaf](https://github.com/wetransform/gha-trivy/commit/013edaf7ac3464e04d3cdbbf5249c11f309149e8))
+* **deps:** update all non-major dependencies ([6434593](https://github.com/wetransform/gha-trivy/commit/643459391f3e6b5e85ef1a86956c44582402b09b))
+* **deps:** update all non-major dependencies ([afa6e10](https://github.com/wetransform/gha-trivy/commit/afa6e10d8dcccafe48477580c0115a00a7521501))
+* **deps:** update all non-major dependencies ([c503bfb](https://github.com/wetransform/gha-trivy/commit/c503bfbe5737a5ae06b816c8710292ef4ed860c9))
+* **deps:** update all non-major dependencies ([0f4f179](https://github.com/wetransform/gha-trivy/commit/0f4f1794ca4458b97c80efc4d86e66a90dac7582))
+* **deps:** update dependency hk to v1.56.0 ([a9662fe](https://github.com/wetransform/gha-trivy/commit/a9662febf2f50ac39a35fc9a2d71a2d5c63543b1))
+* **deps:** update dependency hk to v1.56.1 ([05a520a](https://github.com/wetransform/gha-trivy/commit/05a520ae800d12edee22f68cc766e65e4782788b))
+* **deps:** update jdx/mise-action action to v5 ([49ed992](https://github.com/wetransform/gha-trivy/commit/49ed9925d714a46833bfb8024b18d028a0c78cc0))
+* key the trivy cache by day instead of by workflow run ([7878513](https://github.com/wetransform/gha-trivy/commit/7878513572f6f17f9d7e0e0c3b046b349ef5b346))
+
 ## [3.0.0](https://github.com/wetransform/gha-trivy/compare/v2.7.0...v3.0.0) (2026-08-12)
 
 ### ⚠ BREAKING CHANGES
