@@ -88,3 +88,29 @@ An invalid or non-numeric threshold value emits a warning and falls back to
 `40` (grype never fails the build).
 
 Set `grype-enabled: "false"` to disable the grype scan entirely.
+
+## Database caches
+
+The scanner databases are stored in the GitHub Actions cache: the trivy databases
+with one cache per day (`<os>-trivy-db-<date>`), the grype database with one
+cache per published database build (`<os>-grype-db-<build time>-<schema>`). If the action runs
+several times in the same job, the databases on disk are reused.
+
+Caches are scoped to the ref they were saved for, so outdated copies would pile up
+across pull requests. The action therefore deletes outdated caches with these key
+prefixes once a cache with the current key exists:
+
+- grype: all caches of older database builds, in all refs (only the latest build
+  is ever restored);
+- trivy: caches of previous days, for each ref that can restore today's cache
+  (today's cache exists for that ref or for the default branch).
+
+Deleting caches requires an additional permission in the calling workflow:
+
+```yaml
+permissions:
+  actions: write
+```
+
+This is optional — without it the action emits a notice and leaves the cleanup
+to GitHub's regular cache eviction.

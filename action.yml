@@ -212,8 +212,18 @@ runs:
       shell: bash
       run: |
         echo "date=$(date -u +%Y-%m-%d)" >> $GITHUB_OUTPUT
+        # If the action already ran in this job, the databases are still on disk.
+        # Restoring (and saving) the cache again would only cost time and ~1 GB of temporary disk space.
+        if [ -f ".trivy/db/metadata.json" ]; then
+          echo "present=true" >> $GITHUB_OUTPUT
+        else
+          echo "present=false" >> $GITHUB_OUTPUT
+        fi
+        echo "Disk usage before scan:"
+        df -h . || true
     - name: Restore trivy cache
       id: cache-trivy-restore
+      if: steps.cache-trivy-key.outputs.present != 'true'
       uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: .trivy
@@ -384,6 +394,45 @@ runs:
         output-file: "${{ env.REPORT_SLUG }}-syft.json"
         upload-artifact: false
 
+    # Cache the grype DB ourselves instead of using the scan action's `cache-db`: that uses a
+    # fixed cache key per grype version which is never overwritten, so the cached DB is outdated
+    # after 5 days - it is still restored (~2 GB), but grype then downloads a fresh one anyway.
+    # Instead the cache is keyed by the build of the latest published DB, so a cache hit is
+    # always the current DB and nothing needs to be downloaded.
+    - name: Determine grype DB cache key
+      id: cache-grype-key
+      if: "${{ inputs.grype-enabled == 'true' }}"
+      continue-on-error: true
+      shell: bash
+      env:
+        # listing for the DB schema used by the grype version below
+        GRYPE_DB_LATEST_URL: https://grype.anchore.io/databases/v6/latest.json
+      run: |
+        # If the action already ran in this job, the DB is still on disk
+        if compgen -G "$HOME/.cache/grype/db/*/vulnerability.db" > /dev/null; then
+          echo "DB already present, skipping cache"
+          exit 0
+        fi
+        # Without a key (listing not reachable or not as expected) the cache is skipped and grype downloads the DB.
+        # The build time comes first in the key, so that the keys sort by age.
+        BUILD=$(curl -fsSL --retry 2 --max-time 30 "$GRYPE_DB_LATEST_URL" \
+          | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{try{const j=JSON.parse(d);if(typeof j.built==="string"&&j.built&&typeof j.schemaVersion==="string"&&j.schemaVersion)process.stdout.write(`${j.built}-${j.schemaVersion}`.replace(/[^A-Za-z0-9_.-]/g,"-"))}catch(e){}})' \
+          || true)
+        if [ -n "$BUILD" ]; then
+          echo "key=${{ runner.os }}-grype-db-$BUILD" >> $GITHUB_OUTPUT
+        else
+          echo "::notice::Could not determine the latest grype DB build, not using the grype DB cache"
+        fi
+    - name: Restore grype DB cache
+      id: cache-grype-restore
+      if: "${{ inputs.grype-enabled == 'true' && steps.cache-grype-key.outputs.key != '' }}"
+      continue-on-error: true
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/.cache/grype/db
+        # no restore-keys: an older DB would be replaced by grype right away
+        key: ${{ steps.cache-grype-key.outputs.key }}
+
     - name: Scan SBOM with grype
       id: grype-scan
       if: "${{ inputs.grype-enabled == 'true' }}"
@@ -398,7 +447,25 @@ runs:
         output-format: json
         output-file: "${{ env.REPORT_SLUG }}-grype.json"
         fail-build: false
-        cache-db: true
+        # cache is handled by the steps around this one
+        cache-db: false
+
+    - name: Save grype DB cache
+      if: "${{ inputs.grype-enabled == 'true' && steps.cache-grype-key.outputs.key != '' && steps.cache-grype-restore.outputs.cache-hit != 'true' }}"
+      continue-on-error: true # ignore error (e.g. if cache was already saved by a parallel job)
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/.cache/grype/db
+        key: ${{ steps.cache-grype-key.outputs.key }}
+    # Only the cache of the latest DB is ever restored, so remove all others (in all refs)
+    - name: Delete outdated grype DB caches
+      if: "${{ inputs.grype-enabled == 'true' && steps.cache-grype-key.outputs.key != '' }}"
+      continue-on-error: true # cleaning up is optional
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        bash "${GITHUB_ACTION_PATH}/scripts/evict-stale-caches.sh" "${{ runner.os }}-grype-db-" "${{ steps.cache-grype-key.outputs.key }}" --any-ref
 
     - name: Create grype summary
       if: "${{ inputs.grype-enabled == 'true' }}"
@@ -519,15 +586,31 @@ runs:
     - name: Fix .trivy permissions
       shell: bash
       run: sudo chown -R $(stat . -c %u:%g) .trivy
+    - name: Report disk usage
+      if: always()
+      shell: bash
+      run: |
+        echo "Disk usage after scan:"
+        df -h . || true
     - name: Save trivy cache
       continue-on-error: true # ignore error (e.g. if cache was already saved by a parallel job)
-      # always save, unless today's cache was already restored
-      if: always() && steps.cache-trivy-restore.outputs.cache-hit != 'true'
+      # always save, unless today's cache was already restored or the cache was handled by a previous run of this action in the same job
+      if: always() && steps.cache-trivy-key.outputs.present != 'true' && steps.cache-trivy-restore.outputs.cache-hit != 'true'
       id: cache-trivy-save
       uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: .trivy
         key: ${{ steps.cache-trivy-restore.outputs.cache-primary-key }}
+    # Caches of previous days are no longer needed by refs that can restore today's cache
+    - name: Delete outdated trivy caches
+      if: always() && steps.cache-trivy-key.outputs.present != 'true'
+      continue-on-error: true # cleaning up is optional
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        DEFAULT_REF: refs/heads/${{ github.event.repository.default_branch }}
+      run: |
+        bash "${GITHUB_ACTION_PATH}/scripts/evict-stale-caches.sh" "${{ runner.os }}-trivy-db-" "${{ runner.os }}-trivy-db-${{ steps.cache-trivy-key.outputs.date }}"
 
     #
     # Report on unit tests and critical vulnerabilities
