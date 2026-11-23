@@ -1,3 +1,12 @@
+## [3.0.2](https://github.com/wetransform/gha-trivy/compare/v3.0.1...v3.0.2) (2026-11-23)
+
+### Bug Fixes
+
+* avoid running out of disk space through scanner database caches ([54bb42b](https://github.com/wetransform/gha-trivy/commit/54bb42b043f2a6ae625294aba5348c49bccae409))
+* **deps:** update all non-major dependencies ([ffdfbaa](https://github.com/wetransform/gha-trivy/commit/ffdfbaa3c4615c28fe1371f408e647d509a09630))
+* **deps:** update all non-major dependencies ([ceae083](https://github.com/wetransform/gha-trivy/commit/ceae083ff3b5c468de4dd0a868e0178c9db5baf4))
+* **deps:** update hk ([ff55c3a](https://github.com/wetransform/gha-trivy/commit/ff55c3a5994f243a16fb70c78cfc8c05e7f748d0))
+
 ## [3.0.1](https://github.com/wetransform/gha-trivy/compare/v3.0.0...v3.0.1) (2026-11-03)
 
 ### Bug Fixes
